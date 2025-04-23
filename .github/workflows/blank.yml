@@ -33,6 +33,7 @@ jobs:
         run: |
             # unzip to test folder (might need to create it?)
             7z x archive.zip -otest
+            ls -l test
 
 
 
