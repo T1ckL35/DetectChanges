@@ -36,6 +36,21 @@ jobs:
             ls
             cd test
             ls -la
+      - name: setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+      - name: Run a python script inline
+        shell: python
+        run: |
+          import os
+          import sys
+
+          print(os.getcwd())
+          print("Hello world!")
+          sys.exit()
+      - name: Run script
+        run: python3 .github/scripts/test.py
 
 
 # on:
