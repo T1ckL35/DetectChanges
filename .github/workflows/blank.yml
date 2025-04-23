@@ -30,7 +30,9 @@ jobs:
         run: |
             echo ${{ steps.changed-files.outputs.changed_files }} | while read line ; do xargs zip archive.zip $line ; done
       - name: Extract some files
-        run: 7z x archive.zip
+        run: |
+            # unzip to test folder (might need to create it?)
+            7z x archive.zip -otest
 
 
 
