@@ -28,8 +28,6 @@ jobs:
           esac
           changedFiles=$(git diff --name-only --diff-filter=d "${firstCommit}~1" "${lastCommit}")
           echo "changedFiles: $changedFiles"
-          
-
 
 
 
