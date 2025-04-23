@@ -27,12 +27,10 @@ jobs:
                 echo "$file was changed"
             done
       - name: Zip top-level folders with their contents
-        run: echo -e ${{ steps.changed-files.outputs.changed_files }} |
-          tr ' ' '\n' |
-          cut -d/ -f1 |
-          sort -u | 
-          egrep "^[^\.]" |
-          xargs -n1 -I % sh -c '[ -d % ] && echo "Zipping %..." && zip -r %.zip % || true'
+        run: |
+            echo ${{ steps.changed-files.outputs.changed_files }} | while read line ; do xargs zip archive.zip $line ; done
+      - name: Extract some files
+        run: 7z x archive.zip
 
 
 
