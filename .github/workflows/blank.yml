@@ -54,7 +54,7 @@ jobs:
           print("Hello world!")
           sys.exit()
       - name: Run script
-        run: python3 .github/scripts/test.py ${{ steps.changed-files.outputs.changed_files }}
+        run: python3 .github/scripts/test.py "${{ steps.changed-files.outputs.changed_files }}"
 
 
 # on:
