@@ -15,6 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     # To add in at some point
     # if: github.event.pull_request.merged == true
+    # Map a step output to a job output. A shortcut way to defining a variable instead of the full path
+    #     e.g, 
+    outputs:
+      output1: ${{ steps.changed-files.outputs.changed_files }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -22,6 +26,7 @@ jobs:
       - name: Get changed files
         id: changed-files
         run: |
+            # Pushes output to $GITHUB_OUTPUT so it can be used in other jobs/steps
             if ${{ github.event_name == 'pull_request' }}; then
                 echo "changed_files=$(git diff --name-only -r HEAD^1 HEAD | xargs)" >> $GITHUB_OUTPUT
             else
@@ -42,6 +47,15 @@ jobs:
             ls
             cd test
             ls -la
+  python-test:
+    name: test_using_python
+    runs-on: ubuntu-latest
+    # testing needs dependency and also the getting an output from that job and using it as an environment variable
+    needs:
+      - get_files
+    env:
+      OUTPUT1: ${{needs.get_files.outputs.output1}}
+    steps:
       - name: setup python
         uses: actions/setup-python@v5
         with:
@@ -54,6 +68,7 @@ jobs:
 
           print(os.getcwd())
           print("Hello world!")
+          print(os.environ['OUTPUT1'])
           sys.exit()
       - name: Run script
         run: python3 .github/scripts/test.py "${{ steps.changed-files.outputs.changed_files }}"
