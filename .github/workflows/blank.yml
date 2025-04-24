@@ -4,11 +4,15 @@ on:
     branches: [ main ]
   push:
     branches: [ main ]
+    paths: 
+       - 'modules/**'
 
 jobs:
   get_files:
     name: run_on_pr_or_push
     runs-on: ubuntu-latest
+    # To add in at some point
+    # if: github.event.pull_request.merged == true
     steps:
       - uses: actions/checkout@v3
         with:
@@ -50,7 +54,7 @@ jobs:
           print("Hello world!")
           sys.exit()
       - name: Run script
-        run: python3 .github/scripts/test.py
+        run: python3 .github/scripts/test.py ${{ steps.changed-files.outputs.changed_files }}
 
 
 # on:
