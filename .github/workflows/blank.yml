@@ -47,6 +47,8 @@ jobs:
             ls
             cd test
             ls -la
+            # not for here but just checking tags in the repo
+            git tag -l --sort=-version:refname "module1*"
   python-test:
     name: test_using_python
     runs-on: ubuntu-latest
