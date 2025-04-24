@@ -2,6 +2,8 @@
 on:
   pull_request:
     branches: [ main ]
+    paths: 
+       - 'modules/**'
   push:
     branches: [ main ]
     paths: 
