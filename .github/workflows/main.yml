@@ -50,37 +50,39 @@ jobs:
             # not for here but just checking tags in the repo
             git tag -l --sort=-version:refname "module1*"
       - name: Run script
+        shell: bash
         env:
             # wrapped in quotes to make sure it is passed as a space separated string to python
             CHANGED_FILES: ${{ steps.changed-files.outputs.changed_files }}
-        run: python3 .github/scripts/test.py -f "$env:CHANGED_FILES"
-  python-test:
-    name: test_using_python
-    runs-on: ubuntu-latest
-    # testing needs dependency and also the getting an output from that job and using it as an environment variable
-    needs:
-      - get_files
-    env:
-      OUTPUT1: ${{needs.get_files.outputs.output1}}
-    steps:
-      # As this is another job the previous checked out code is not present. In this case we have to check the codebase out again as we are on a clean runner
-      - uses: actions/checkout@v3
-        with:
-            fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
-      - name: setup python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.12
-      - name: Run a python script inline
-        shell: python
         run: |
-          import os
-          import sys
+            python3 .github/scripts/test.py -f $env:CHANGED_FILES
+  # python-test:
+  #   name: test_using_python
+  #   runs-on: ubuntu-latest
+  #   # testing needs dependency and also the getting an output from that job and using it as an environment variable
+  #   needs:
+  #     - get_files
+  #   env:
+  #     OUTPUT1: ${{needs.get_files.outputs.output1}}
+  #   steps:
+  #     # As this is another job the previous checked out code is not present. In this case we have to check the codebase out again as we are on a clean runner
+  #     - uses: actions/checkout@v3
+  #       with:
+  #           fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
+  #     - name: setup python
+  #       uses: actions/setup-python@v5
+  #       with:
+  #         python-version: 3.12
+  #     - name: Run a python script inline
+  #       shell: python
+  #       run: |
+  #         import os
+  #         import sys
 
-          print(os.getcwd())
-          print("Hello world!")
-          print(os.environ['OUTPUT1'])
-          sys.exit()
+  #         print(os.getcwd())
+  #         print("Hello world!")
+  #         print(os.environ['OUTPUT1'])
+  #         sys.exit()
 
 
 
