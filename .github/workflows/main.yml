@@ -51,7 +51,7 @@ jobs:
             ls -la
             # not for here but just checking tags in the repo
             git tag -l --sort=-version:refname "module1*"
-      - name: Re-checkout repository to get the full history to allow GitVersion to work (fails if the depth is shallow as a pull request depth gives)
+      - name: Re-checkout repo if not all history is present (this only runs on PR)
         if: ${{ github.event_name == 'pull_request' }}
         uses: actions/checkout@v4
         with:
