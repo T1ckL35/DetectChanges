@@ -50,10 +50,10 @@ jobs:
             # not for here but just checking tags in the repo
             git tag -l --sort=-version:refname "module1*"
       - name: Run script
-        run: python3 .github/scripts/test.py -f $env:changed-files
         env:
             # wrapped in quotes to make sure it is passed as a space separated string to python
-            changed-files: "${{ steps.changed-files.outputs.changed_files }}"
+            CHANGED_FILES: ${{ steps.changed-files.outputs.changed_files }}
+        run: python3 .github/scripts/test.py -f "$env:CHANGED_FILES"
   python-test:
     name: test_using_python
     runs-on: ubuntu-latest
