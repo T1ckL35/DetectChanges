@@ -52,7 +52,6 @@ jobs:
       - name: Run script
         #shell: bash
         env:
-            
             CHANGED_FILES: ${{ steps.changed-files.outputs.changed_files }}
         run: |
             # wrapped in quotes to make sure it is passed as a space separated string to python

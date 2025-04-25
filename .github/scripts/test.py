@@ -49,9 +49,10 @@ class PackageModule:
         # go through each filepath and get the module name
         modules_list = []
         for file in files_list:
-            module_name = file.split(os.path.sep)[-2]
-            if module_name not in modules_list:
-                modules_list.append(module_name)
+            path_parts = file.split(os.path.sep)
+            if path_parts[0] == "modules":
+                if path_parts[1] not in modules_list:
+                    modules_list.append(path_parts[1])
         print(modules_list)
 
 
