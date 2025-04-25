@@ -22,9 +22,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-            fetch-depth: 2  # testing!!!!!
-            # temp removal for testing gitversion
-            #fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
+            # Note, if it returns a depth of 2 then it will not contain the full history. As such we repeat the checkout further down so that GitVersion has the full history to use..
+            fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
       - name: Get changed files
         id: changed-files
         run: |
@@ -51,9 +50,10 @@ jobs:
             ls -la
             # not for here but just checking tags in the repo
             git tag -l --sort=-version:refname "module1*"
-      - uses: actions/checkout@v4
+      - name: Get full repository history (required for GitVersion)
+        uses: actions/checkout@v4
         with:
-            fetch-depth: 0  # testing!!!!!
+            fetch-depth: 0
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v3.2.0
         with:
