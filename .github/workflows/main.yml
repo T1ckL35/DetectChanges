@@ -20,7 +20,7 @@ jobs:
     outputs:
       output1: ${{ steps.changed-files.outputs.changed_files }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
             fetch-depth: 0
             # temp removal for testing gitversion
@@ -51,12 +51,15 @@ jobs:
             ls -la
             # not for here but just checking tags in the repo
             git tag -l --sort=-version:refname "module1*"
-      # - name: Install GitVersion
-      #  uses: gittools/actions/gitversion/setup@v3.2.0
-      #  with:
-      #      versionSpec: '6.2.x'
-      - name: GitVersion
-        id: gitversion
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v3.2.0
+        with:
+            versionSpec: '6.2.x'
+      - name: Determine Version
+        id: version_step # step id used as reference for output values
+        uses: gittools/actions/gitversion/execute@v3.2.0
+      #- name: GitVersion
+      #  id: gitversion
         # Note, gitversion requires fetch_depth of zero to get all history to work on!
         # Means we may need to modify the pull request fetch-depth near the top of this script and rework things...
         # E.g,
@@ -64,10 +67,10 @@ jobs:
         #   uses: actions/checkout@v4
         #       with:
         #           fetch-depth: 0
-        run: |
-            # Not well documented but GitVersion exposes all version variables as environment variables in the form GitVersion_<variable_name>
-            gitversion /output buildserver
-            echo "GitVersion_MajorMinorPatch"
+      #  run: |
+      #      # Not well documented but GitVersion exposes all version variables as environment variables in the form GitVersion_<variable_name>
+      #      gitversion /output buildserver
+      #      echo "GitVersion_MajorMinorPatch"
       - name: Run script
         #shell: bash
         env:
