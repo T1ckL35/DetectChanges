@@ -58,21 +58,26 @@ jobs:
       - name: Determine Version
         id: version_step # step id used as reference for output values
         uses: gittools/actions/gitversion/execute@v3.2.0
-      - name: GitVersion
-        id: gitversion
-        # Note, gitversion requires fetch_depth of zero to get all history to work on!
-        # Means we may need to modify the pull request fetch-depth near the top of this script and rework things...
-        # E.g,
-        # - name: Checkout
-        #   uses: actions/checkout@v4
-        #       with:
-        #           fetch-depth: 0
-        run: |
-            # Not well documented but GitVersion exposes all version variables as environment variables in the form GitVersion_<variable_name>
-            #which gitversion
-            gitversion /output buildserver
-            #echo "$GitVersion_MajorMinorPatch"
-            #echo $env:GitVersion_MajorMinorPatch
+        with:
+          updateProjectFiles: true
+      # - name: Determine Version
+      #   id: version_step # step id used as reference for output values
+      #   uses: gittools/actions/gitversion/execute@v3.2.0
+      # - name: GitVersion
+      #   id: gitversion
+      #   # Note, gitversion requires fetch_depth of zero to get all history to work on!
+      #   # Means we may need to modify the pull request fetch-depth near the top of this script and rework things...
+      #   # E.g,
+      #   # - name: Checkout
+      #   #   uses: actions/checkout@v4
+      #   #       with:
+      #   #           fetch-depth: 0
+      #   run: |
+      #       # Not well documented but GitVersion exposes all version variables as environment variables in the form GitVersion_<variable_name>
+      #       #which gitversion
+      #       gitversion /output buildserver
+      #       #echo "$GitVersion_MajorMinorPatch"
+      #       #echo $env:GitVersion_MajorMinorPatch
       - name: Run script
         #shell: bash
         env:
