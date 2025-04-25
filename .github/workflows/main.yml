@@ -20,10 +20,17 @@ jobs:
     outputs:
       output1: ${{ steps.changed-files.outputs.changed_files }}
     steps:
-      - uses: actions/checkout@v4
+      - id: checkout-codebase
+        uses: actions/checkout@v4
         with:
+            if ${{ github.event_name == 'pull_request' }}; then
+                  echo "fetch-depth-value=2"  >> $GITHUB_OUTPUT
+              else
+                  echo "fetch-depth-value=0" >> $GITHUB_OUTPUT
+              fi
             # Note, if it returns a depth of 2 then it will not contain the full history. As such we repeat the checkout further down so that GitVersion has the full history to use..
-            fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
+            fetch-depth: ${{ steps.checkout-codebase.outputs.fetch-depth-value }}
+            # fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
       - name: Get changed files
         id: changed-files
         run: |
@@ -51,6 +58,7 @@ jobs:
             # not for here but just checking tags in the repo
             git tag -l --sort=-version:refname "module1*"
       - name: Get full repository history (required for GitVersion)
+        if: ${{ steps.checkout-codebase.outputs.fetch-depth-value != 0 }}
         uses: actions/checkout@v4
         with:
             fetch-depth: 0
