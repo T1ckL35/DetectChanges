@@ -1,9 +1,9 @@
 
 on:
-  pull_request:
-    branches: [ main ]
-    paths: 
-       - 'modules/**'
+  #pull_request:
+  #  branches: [ main ]
+  #  paths: 
+  #     - 'modules/**'
   push:
     branches: [ main ]
     paths: 
@@ -22,7 +22,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-            fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
+            fetch-depth: 0
+            # temp removal for testing gitversion
+            #fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
       - name: Get changed files
         id: changed-files
         run: |
