@@ -81,10 +81,15 @@ jobs:
       - name: Run script
         #shell: bash
         env:
+            SEMVER: ${{ steps.version_step.outputs.MajorMinorPatch }}
             CHANGED_FILES: ${{ steps.changed-files.outputs.changed_files }}
         run: |
+            echo "$SEMVER"
             # wrapped in quotes to make sure it is passed as a space separated string to python
             python3 .github/scripts/test.py -f "$CHANGED_FILES"
+      - run: |
+            echo "FullSemVer (env.fullSemVer)            : ${{ env.fullSemVer }}"
+        name: Display GitVersion variables (without prefix)
   # python-test:
   #   name: test_using_python
   #   runs-on: ubuntu-latest
