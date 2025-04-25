@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-            fetch-depth: 0
+            fetch-depth: 2  # testing!!!!!
             # temp removal for testing gitversion
             #fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
       - name: Get changed files
@@ -51,6 +51,9 @@ jobs:
             ls -la
             # not for here but just checking tags in the repo
             git tag -l --sort=-version:refname "module1*"
+      #- uses: actions/checkout@v4
+      #  with:
+      #      fetch-depth: 0  # testing!!!!!
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v3.2.0
         with:
