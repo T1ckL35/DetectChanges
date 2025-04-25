@@ -56,8 +56,8 @@ jobs:
             CHANGED_FILES: ${{ steps.changed-files.outputs.changed_files }}
         run: |
             echo ${{ steps.changed-files.outputs.changed_files }}
-            echo $env:CHANGED_FILES
-            python3 .github/scripts/test.py -f \"$env:CHANGED_FILES\"
+            echo "$CHANGED_FILES"
+            python3 .github/scripts/test.py -f "$CHANGED_FILES"
   # python-test:
   #   name: test_using_python
   #   runs-on: ubuntu-latest
