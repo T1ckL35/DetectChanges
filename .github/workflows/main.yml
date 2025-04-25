@@ -51,10 +51,10 @@ jobs:
             ls -la
             # not for here but just checking tags in the repo
             git tag -l --sort=-version:refname "module1*"
-      - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v3.2.0
-        with:
-            versionSpec: '6.2.x'
+      # - name: Install GitVersion
+      #  uses: gittools/actions/gitversion/setup@v3.2.0
+      #  with:
+      #      versionSpec: '6.2.x'
       - name: GitVersion
         id: gitversion
         # Note, gitversion requires fetch_depth of zero to get all history to work on!
