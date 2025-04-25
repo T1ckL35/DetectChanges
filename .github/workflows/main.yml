@@ -55,6 +55,7 @@ jobs:
             # wrapped in quotes to make sure it is passed as a space separated string to python
             CHANGED_FILES: ${{ steps.changed-files.outputs.changed_files }}
         run: |
+            echo ${{ steps.changed-files.outputs.changed_files }}
             python3 .github/scripts/test.py -f $env:CHANGED_FILES
   # python-test:
   #   name: test_using_python
