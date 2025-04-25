@@ -94,6 +94,7 @@ jobs:
             python3 .github/scripts/test.py -f "$CHANGED_FILES"
       - run: |
             echo "FullSemVer (env.fullSemVer)            : ${{ env.fullSemVer }}"
+            echo "MajorMinorPatch (env.MajorMinorPatch)  : ${{ env.MajorMinorPatch }}"
         name: Display GitVersion variables (without prefix)
   # python-test:
   #   name: test_using_python
