@@ -71,7 +71,7 @@ jobs:
             # Not well documented but GitVersion exposes all version variables as environment variables in the form GitVersion_<variable_name>
             which gitversion
             gitversion /output buildserver
-            echo "$GitVersion_MajorMinorPatch"
+            #echo "$GitVersion_MajorMinorPatch"
             echo $env:GitVersion_MajorMinorPatch
       - name: Run script
         #shell: bash
