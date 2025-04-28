@@ -118,7 +118,8 @@ jobs:
           major_pattern: "(MAJOR-DB)"
           minor_pattern: "(MINOR-DB)"
           change_path: "modules/module2"
-          namespace: suffix-test-module2
+          # add suffix to tag e.g, module2-0.0.1-suffix-test-module2
+          # namespace: suffix-test-module2
           tag_prefix: "module2-"
 
 
