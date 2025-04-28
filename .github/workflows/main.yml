@@ -75,7 +75,7 @@ jobs:
         with:
             useConfigFile: true
             configFilePath: "modules/module2/GitVersion.yml"
-            arguments: '/showConfig'
+            #arguments: '/showConfig'
             #overrideConfig: |
             #  mode=MainLine
         #with:
