@@ -1,5 +1,5 @@
 
-workflow: GitHubFlow/v1
+#workflow: GitHubFlow/v1
 # pattern match to remove the prefix before checking for a semver tag
-#tag-prefix: 'module1-'
+tag-prefix: module1-
 
