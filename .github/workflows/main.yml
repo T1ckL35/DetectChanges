@@ -73,8 +73,8 @@ jobs:
         id: version_step # step id used as reference for output values
         uses: gittools/actions/gitversion/execute@v3.2.1
         with:
-            useConfigFile: true
-            configFilePath: modules/module1/GitVersion.yml
+            #useConfigFile: true
+            #configFilePath: modules/module1/GitVersion.yml
             overrideConfig: |
                 tag-prefix=module1-
             #arguments: '/showConfig'
@@ -121,8 +121,8 @@ jobs:
         id: version_module_step # step id used as reference for output values
         uses: gittools/actions/gitversion/execute@v3.2.1
         with:
-            useConfigFile: true
-            configFilePath: modules/module2/GitVersion.yml
+            #useConfigFile: true
+            #configFilePath: modules/module2/GitVersion.yml
             #disableCache: true
             #targetPath: "modules/module2"
             overrideConfig: |
