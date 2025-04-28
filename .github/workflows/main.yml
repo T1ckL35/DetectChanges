@@ -105,6 +105,22 @@ jobs:
             echo "FullSemVer (env.fullSemVer)            : ${{ env.fullSemVer }}"
             echo "GitVersion_MajorMinorPatch (env.GitVersion_MajorMinorPatch)  : ${{ env.GitVersion_MajorMinorPatch }}"
         name: Display GitVersion variables (without prefix)
+      - name: Module1 Version
+        id: module1-version
+        uses: paulhatch/semantic-version@v5.4.0
+        with:
+          change_path: "modules/module1"
+      - name: Module2 Version
+        id: module2-version
+        uses: paulhatch/semantic-version@v5.4.0
+        with:
+          major_pattern: "(MAJOR-DB)"
+          minor_pattern: "(MINOR-DB)"
+          change_path: "modules/module2"
+          namespace: suffix-test-module2
+
+
+        
   # python-test:
   #   name: test_using_python
   #   runs-on: ubuntu-latest
