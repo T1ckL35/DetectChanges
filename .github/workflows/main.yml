@@ -126,7 +126,7 @@ jobs:
           echo "module1 version tag        : ${{ steps.module1-version.outputs.version_tag }}"
           echo "module2 version            : ${{ steps.module2-version.outputs.version }}"
           echo "module2 version tag        : ${{ steps.module2-version.outputs.version_tag }}"
-      name: Display semantic versioning variables
+        name: Display semantic versioning variables
 
 
         
