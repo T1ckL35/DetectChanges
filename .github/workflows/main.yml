@@ -76,7 +76,7 @@ jobs:
             useConfigFile: true
             configFilePath: modules/module1/GitVersion.yml
             overrideConfig: |
-              tag-prefix=module1-
+                tag-prefix=module1-
             #arguments: '/showConfig'
             #overrideConfig: |
             #  mode=MainLine
@@ -125,8 +125,8 @@ jobs:
             configFilePath: modules/module2/GitVersion.yml
             #disableCache: true
             #targetPath: "modules/module2"
-            #overrideConfig: |
-            #  tag-prefix=module2-
+            overrideConfig: |
+                tag-prefix=module2-
       # - name: Run script3
       #   run: |
       #     cd ../../
