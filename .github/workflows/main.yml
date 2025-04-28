@@ -110,6 +110,7 @@ jobs:
         uses: paulhatch/semantic-version@v5.4.0
         with:
           change_path: "modules/module1"
+          tag_prefix: "module1-"
       - name: Module2 Version
         id: module2-version
         uses: paulhatch/semantic-version@v5.4.0
@@ -118,6 +119,7 @@ jobs:
           minor_pattern: "(MINOR-DB)"
           change_path: "modules/module2"
           namespace: suffix-test-module2
+          tag_prefix: "module2-"
 
 
         
