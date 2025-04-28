@@ -74,7 +74,7 @@ jobs:
         uses: gittools/actions/gitversion/execute@v3.2.1
         with:
             useConfigFile: true
-            configFilePath: "modules/module1/GitVersion.yml"
+            configFilePath: modules/module1/GitVersion.yml
             overrideConfig: |
               tag-prefix=module1-
             #arguments: '/showConfig'
@@ -122,7 +122,7 @@ jobs:
         uses: gittools/actions/gitversion/execute@v3.2.1
         with:
             useConfigFile: true
-            configFilePath: "modules/module2/GitVersion.yml"
+            configFilePath: modules/module2/GitVersion.yml
             #disableCache: true
             #targetPath: "modules/module2"
             #overrideConfig: |
