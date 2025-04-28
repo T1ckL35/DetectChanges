@@ -105,6 +105,17 @@ jobs:
             echo "FullSemVer (env.fullSemVer)            : ${{ env.fullSemVer }}"
             echo "GitVersion_MajorMinorPatch (env.GitVersion_MajorMinorPatch)  : ${{ env.GitVersion_MajorMinorPatch }}"
         name: Display GitVersion variables (without prefix)
+
+      - name: Run script2
+        run: |
+          cd modules/module1
+      - name: Determine Module Version
+        id: version_module_step # step id used as reference for output values
+        uses: gittools/actions/gitversion/execute@v3.2.0
+      - name: Run script3
+        run: |
+          cd ../../
+
       - name: Module1 Version
         id: module1-version
         uses: paulhatch/semantic-version@v5.4.0
