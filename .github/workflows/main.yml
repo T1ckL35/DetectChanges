@@ -123,6 +123,7 @@ jobs:
         with:
             useConfigFile: 'true'
             configFilePath: "modules/module2/GitVersion.yml"
+            targetPath: "modules/module2"
             #overrideConfig: |
             #  tag-prefix=module2-
       # - name: Run script3
