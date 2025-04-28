@@ -124,8 +124,10 @@ jobs:
       - run: |
           echo "module1 version            : ${{ steps.module1-version.outputs.version }}"
           echo "module1 version tag        : ${{ steps.module1-version.outputs.version_tag }}"
+          git tag -l --sort=-version:refname "module1*"
           echo "module2 version            : ${{ steps.module2-version.outputs.version }}"
           echo "module2 version tag        : ${{ steps.module2-version.outputs.version_tag }}"
+          git tag -l --sort=-version:refname "module2*"
         name: Display semantic versioning variables
 
 
