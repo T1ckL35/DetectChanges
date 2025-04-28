@@ -75,7 +75,7 @@ jobs:
         with:
             targetPath: 'modules/module1'
             useConfigFile: true
-            #configFilePath: modules/module1/GitVersion.yml
+            configFilePath: modules/module1/GitVersion.yml
             #overrideConfig: |
             #    tag-prefix=module1-
             #arguments: '/showConfig'
