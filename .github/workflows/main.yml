@@ -124,7 +124,7 @@ jobs:
             useConfigFile: true
             configFilePath: "modules/module2/GitVersion.yml"
             disableCache: true
-            targetPath: "modules/module2"
+            #targetPath: "modules/module2"
             #overrideConfig: |
             #  tag-prefix=module2-
       # - name: Run script3
