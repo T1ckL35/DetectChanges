@@ -76,8 +76,7 @@ jobs:
             useConfigFile: true
             configFilePath: "modules/module1/GitVersion.yml"
             overrideConfig: |
-              update-build-number=false
-              next-version=3.2.1
+              tag-prefix=test
             #arguments: '/showConfig'
             #overrideConfig: |
             #  mode=MainLine
