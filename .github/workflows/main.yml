@@ -121,6 +121,12 @@ jobs:
           # add suffix to tag e.g, module2-0.0.1-suffix-test-module2
           # namespace: suffix-test-module2
           tag_prefix: "module2-"
+      - run: |
+          echo "module1 version            : ${{ steps.module1-version.outputs.version }}"
+          echo "module1 version tag        : ${{ steps.module1-version.outputs.version_tag }}"
+          echo "module2 version            : ${{ steps.module2-version.outputs.version }}"
+          echo "module2 version tag        : ${{ steps.module2-version.outputs.version_tag }}"
+      name: Display semantic versioning variables
 
 
         
