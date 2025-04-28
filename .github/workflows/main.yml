@@ -74,7 +74,10 @@ jobs:
         uses: gittools/actions/gitversion/execute@v3.2.0
         with:
             useConfigFile: true
-            configFilePath: "modules/module1/GitVersion.yml"
+            configFilePath: "modules/module2/GitVersion.yml"
+            arguments: '/showConfig'
+            #overrideConfig: |
+            #  mode=MainLine
         #with:
         #  updateProjectFiles: true
       # - name: Determine Version
