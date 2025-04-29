@@ -19,7 +19,7 @@ jobs:
     #     e.g, 
     outputs:
       output1: ${{ steps.changed-files.outputs.changed_files }}
-      matrix: ${{ steps.get-changed.outputs.matrix }}
+      matrix: ${{ steps.changed-files.outputs.matrix }}
     steps:
       - id: checkout-codebase
         uses: actions/checkout@v4
