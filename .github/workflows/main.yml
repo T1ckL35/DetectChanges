@@ -40,7 +40,7 @@ jobs:
             fi
             echo "$CHANGED_MODULES"
             # Get all the modules that have a "tests" directory
-            MODULES_WITH_TESTS=$(find modules/ -type d -name "tests" -printf '%h\\n' | cut -d/ -f2 | uniq)
+            MODULES_WITH_TESTS=$(find modules/ -type d -name "tests" -printf '%h\n' | cut -d/ -f2 | uniq)
             # Create our json structure [{"module_name": "source", "has_tests": false|true}]
             MODULES_JSON=$(echo "$CHANGED_MODULES" | jq -R -s -c --argjson modulesWithTests "$(echo "$MODULES_WITH_TESTS" | jq -R -s 'split("\n")[:-1]')" 'split("\n")[:-1] | map({module_name: ., has_tests: (. as $module | $modulesWithTests | any(. == $module))})')
             # Export the modules as json to the outputs
