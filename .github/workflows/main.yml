@@ -38,6 +38,7 @@ jobs:
                 # | grep -v 'modules/common/' # allows exclusion of certain folders
                 export CHANGED_MODULES=$( git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- modules | grep -E 'modules/.*/'  | cut -d/ -f2 | uniq)
             fi
+            echo "$CHANGED_MODULES"
             # Get all the modules that have a "tests" directory
             MODULES_WITH_TESTS=$(find modules/ -type d -name "tests" -printf '%h\\n' | cut -d/ -f2 | uniq)
             # Create our json structure [{"module_name": "source", "has_tests": false|true}]
