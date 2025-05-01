@@ -91,7 +91,10 @@ jobs:
         run: |
             echo "$SEMVER"
             # wrapped in quotes to make sure it is passed as a space separated string to python
+            # writes output to Github Env as env.MODULES_JSON
             python3 .github/scripts/test.py -f "$CHANGED_FILES"
+            #echo "serverquery=$(python3 .github/scripts/test.py -f \\"$CHANGED_FILES\\" 2>&1)"
+      - run: echo ${{ env.MODULES_JSON }}
       - run: |
             echo "FullSemVer (env.fullSemVer)            : ${{ env.fullSemVer }}"
             echo "GitVersion_MajorMinorPatch (env.GitVersion_MajorMinorPatch)  : ${{ env.GitVersion_MajorMinorPatch }}"
