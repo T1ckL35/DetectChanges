@@ -93,11 +93,13 @@ jobs:
             echo "$SEMVER"
             # wrapped in quotes to make sure it is passed as a space separated string to python
             # writes output to Github Env as env.MODULES_JSON2
-            python3 .github/scripts/test.py -f "$CHANGED_FILES"
-            #echo "serverquery=$(python3 .github/scripts/test.py -f \\"$CHANGED_FILES\\" 2>&1)"
-            echo "matrix2=$(echo ${{ env.MODULES_JSON }})" >> $GITHUB_OUTPUT
-      - run: |
-            echo "Module JSON output (env.MODULES_JSON2)            : ${{ env.MODULES_JSON2 }}"
+            # works # python3 .github/scripts/test.py -f "$CHANGED_FILES"
+            export "MODULES_JSON2=$(python3 .github/scripts/test.py -f \\"$CHANGED_FILES\\" 2>&1)"
+            echo "$MODULES_JSON2"
+            ##echo "serverquery=$(python3 .github/scripts/test.py -f \\"$CHANGED_FILES\\" 2>&1)"
+            #echo "matrix2=$(echo ${{ env.MODULES_JSON }})" >> $GITHUB_OUTPUT
+      #- run: |
+      #      echo "Module JSON output (env.MODULES_JSON2)            : ${{ env.MODULES_JSON2 }}"
       - run: |
             echo "Module JSON output (env.MODULES_JSON2)            : ${{ env.MODULES_JSON2 }}"
             echo "FullSemVer (env.fullSemVer)            : ${{ env.fullSemVer }}"

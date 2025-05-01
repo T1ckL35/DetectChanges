@@ -71,7 +71,7 @@ class PackageModule:
 
         #print(modules_list)
         #print(json.dumps(modules_tojson, indent=2))
-        self.args.output = "gh" # TEMP HARDCODE
+        self.args.output = "AZDSFD" # TEMP HARDCODE
 
         if self.args.output == "gh":
             # write to the Github environment variable so it can be subsequently used in the github workflow
@@ -82,8 +82,9 @@ class PackageModule:
             # called by a python script/module so returning the dictionary object
             return modules_tojson
         else:
-            # otherwise just dump a pretty json object to the screen
-            print(json.dumps(modules_tojson, indent=2))
+            print(json.dumps(modules_tojson))
+            ## otherwise just dump a pretty json object to the screen
+            #print(json.dumps(modules_tojson, indent=2))
 
     def get_tests_list(self, module_tests_path):
         """
