@@ -7,6 +7,7 @@ import argparse
 import logging
 import os
 import sys
+import json
 
 class PackageModule:
 
@@ -43,23 +44,42 @@ class PackageModule:
 
     def run(self):
         logging.info('PackageModule running...')
+        print(os.getcwd())
         self.configure()
         files_string = self.args.files
         files_list = files_string.split()
         # go through each filepath and get the module name
         modules_list = []
+        modules_tojson = []
         for file in files_list:
             path_parts = file.split(os.path.sep)
             if path_parts[0] == "modules":
                 if path_parts[1] not in modules_list:
+                    # first test: using a string
                     modules_list.append(path_parts[1])
-        print(modules_list)
+
+
+                    # alternative: build up json data to use in the github actions matrix
+                    has_tests = False
+                    tests_path = os.path.join(path_parts[0], path_parts[1], "tests")
+                    if os.path.isdir(tests_path):
+                        has_tests = True
+                    # build up json data to use in the github actions matrix
+                    modules_tojson.append(
+                        {
+                            "module_name": path_parts[1],
+                            "has_tests": has_tests
+                        }
+                    )
+        #print(modules_list)
+        print(json.dumps(modules_tojson))
 
 
 if __name__ == "__main__":
     try:
+        print(os.getcwd())
         app = PackageModule()
-        app.output_logging()
+        # app.output_logging()
         app.run()
     except Exception as e:
         print("EXCEPTION ENCOUNTERED:")
