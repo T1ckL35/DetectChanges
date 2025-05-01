@@ -20,6 +20,7 @@ jobs:
     outputs:
       output1: ${{ steps.changed-files.outputs.changed_files }}
       matrix: ${{ steps.changed-files.outputs.matrix }}
+      matrix2: ${{ steps.run_script.outputs.matrix2 }}
     steps:
       - id: checkout-codebase
         uses: actions/checkout@v4
@@ -84,6 +85,7 @@ jobs:
             #  mode=MainLine
 
       - name: Run script
+        id: run_script
         #shell: bash
         env:
             SEMVER: ${{ steps.version_step.outputs.MajorMinorPatch }}
@@ -94,6 +96,7 @@ jobs:
             # writes output to Github Env as env.MODULES_JSON
             python3 .github/scripts/test.py -f "$CHANGED_FILES"
             #echo "serverquery=$(python3 .github/scripts/test.py -f \\"$CHANGED_FILES\\" 2>&1)"
+            echo "matrix2=$(echo "${{ env.MODULES_JSON }}")" >> $GITHUB_OUTPUT
       - run: |
             echo "Module JSON output (env.MODULES_JSON)            : ${{ env.MODULES_JSON }}"
       - run: |
