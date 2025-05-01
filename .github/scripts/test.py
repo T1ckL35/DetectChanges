@@ -74,9 +74,9 @@ class PackageModule:
         self.args.output = "gh" # TEMP HARDCODE
 
         if self.args.output == "gh":
-            # write to the Github environment so it can be subsequently used in the github workflow
+            # write to the Github environment variable so it can be subsequently used in the github workflow
             with open(os.environ["GITHUB_ENV"], "a") as fh:
-                fh.write(f"var MODULES_JSON={json.dumps(modules_tojson)}\n")
+                fh.write(f"var MODULES_JSON="{json.dumps(modules_tojson)}"\n")
                 #print(f"var MODULES_JSON={json.dumps(modules_tojson)}\n")
         elif self.args.output == "py_module":
             # called by a python script/module so returning the dictionary object
