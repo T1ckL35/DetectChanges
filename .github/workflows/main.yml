@@ -18,10 +18,9 @@ jobs:
     # Map a step output to a job output. A shortcut way to defining a variable instead of the full path
     #     e.g, 
     outputs:
-      output1: ${{ steps.changed-files.outputs.changed_files }}
-      matrix: ${{ steps.run_script.outputs.dynamic_list }}
+      matrix: ${{ steps.run_script.outputs.dynamic_list }}    # Will be used in another job to run module tests with
     env:
-      NBS_MODULE_MATRIX_NAME: "MODULES_MATRIX"    # defines the variable name in GITHUB_OUTPUT that the python modules script outputs the data to
+      NBS_MODULE_MATRIX_NAME: "MODULES_MATRIX"                # Defines the variable name in GITHUB_OUTPUT that the python modules script outputs the data to
     steps:
       - id: checkout-codebase
         uses: actions/checkout@v4
@@ -36,77 +35,33 @@ jobs:
                 echo "changed_files=$(git diff --name-only -r HEAD^1 HEAD | xargs)" >> $GITHUB_OUTPUT
             else
                 echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
-                # | grep -v 'modules/common/' # allows exclusion of certain folders
             fi
-      - name: bash handle module files
-        id: bash-modules
-        run: |
-            modules=$(echo "${{ steps.changed-files.outputs.changed_files }}" | grep "^modules/" || true)
-            if [[ ! -z "$modules" ]]; then
-                modules=$(echo "$modules" | sed -e "s!modules/!!" | xargs -n1 dirname | uniq)
-            fi
-            echo "changed_modules=$modules"
-      - name: List changed files
-        run: |
-            for file in ${{ steps.changed-files.outputs.changed_files }}; do
-                echo "$file was changed"
-            done
-            echo "changed modules are: ${{ steps.bash-modules.outputs.changed_modules }}"
-      - name: Re-checkout repo if not all history is present (this only runs on PR)
+      - id: recheckout_fetch_depth_0_if_needed
+        name: Re-checkout repo if not all history is present (this only runs on PR)
         # required as GitVersion needs a fetch-depth of 0 to work properly
         if: ${{ github.event_name == 'pull_request' }}
         uses: actions/checkout@v4
         with:
             fetch-depth: 0
-      - name: Install GitVersion
+      - id: install_gitversion
+        name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v3.2.1
         with:
             versionSpec: '6.2.x'
-      - name: Determine Version
-        id: version_step # step id used as reference for output values
+      - id: version_step_module1 # step id used as reference for output values
+        name: Determine Module 1 Version. Todo is make this dynamic
         uses: gittools/actions/gitversion/execute@v3.2.1
         with:
-            #useConfigFile: true
-            #configFilePath: modules/module1/GitVersion.yml
-            #updateProjectFiles: true
+            # NOTE: Tried specifying a configfile in the module's folder but it does NOT work.
+            #   This is the only way it seems to honor using a tag-prefix config value
             overrideConfig: |
                 tag-prefix=module1-
-            #arguments: '/showConfig'
-            #overrideConfig: |
-            #  mode=MainLine
-      - name: setup python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.12
-      - name: Run script
-        id: run_script
-        env:
-            SEMVER: ${{ steps.version_step.outputs.MajorMinorPatch }}
-            CHANGED_FILES: ${{ steps.changed-files.outputs.changed_files }}
-        run: |
-            # causes failure if python script fails
-            set -e
 
-            echo "ENV TEST: ${{ env.NBS_MODULE_MATRIX_NAME }}"
-            # Note, -o defines the name of a variable that is added to GITHUB_OUTPUT with the python script output
-            python3 .github/scripts/test.py -f "$CHANGED_FILES" -o "${{ env.NBS_MODULE_MATRIX_NAME }}"
-
-            # check the python script exited ok (a python exception caught will trigger a sys.exit(1) and fail the step/workflow)
-            if [[ $? = 0 ]]; then
-                echo "success"
-            else
-                echo "failure: $?"
-            fi
-      - run: |
-            echo "MODULES_MATRIX: NAME: ${{ env.NBS_MODULE_MATRIX_NAME }}         VALUE : ${{ steps.run_script.outputs.MODULES_MATRIX }}"
-            echo "FullSemVer (env.fullSemVer)            : ${{ env.fullSemVer }}"
-            echo "GitVersion_MajorMinorPatch (env.GitVersion_MajorMinorPatch)  : ${{ env.GitVersion_MajorMinorPatch }}"
-        name: Display GitVersion variables (without prefix)
-
-      - name: Determine Module Version
-        id: version_module_step # step id used as reference for output values
+      - id: version_step_module2 # step id used as reference for output values
+        name: Determine Module 2 Version. Todo is make this dynamic
         uses: gittools/actions/gitversion/execute@v3.2.1
         with:
+            # NOTE, left in but commented out the attempts to use a configfile which did NOT work
             #useConfigFile: true
             #configFilePath: modules/module2/GitVersion.yml
             #disableCache: true
@@ -114,167 +69,32 @@ jobs:
             overrideConfig: |
                 tag-prefix=module2-
 
+      - id: setup_python
+        name: Set up Python to use
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+      - id: run_script
+        name: Run script
+        env:
+            SEMVER: ${{ steps.version_step.outputs.MajorMinorPatch }}    # example of pulling in a previous step's variable as an environment variable in this step
+        run: |
+            # causes failure if python script fails
+            set -e
 
+            # Note, -o defines the name of a variable that is added to GITHUB_OUTPUT with the python script output
+            python3 .github/scripts/test.py -f "${{ steps.changed-files.outputs.changed_files }}" -o "${{ env.NBS_MODULE_MATRIX_NAME }}"
 
-      # - name: Module1 Version
-      #   id: module1-version
-      #   uses: paulhatch/semantic-version@v5.4.0
-      #   with:
-      #     change_path: "modules/module1"
-      #     tag_prefix: "module1-"
-      # - name: Module2 Version
-      #   id: module2-version
-      #   uses: paulhatch/semantic-version@v5.4.0
-      #   with:
-      #     major_pattern: "(MAJOR-DB)"
-      #     minor_pattern: "(MINOR-DB)"
-      #     change_path: "modules/module2"
-      #     # add suffix to tag e.g, module2-0.0.1-suffix-test-module2
-      #     # namespace: suffix-test-module2
-      #     tag_prefix: "module2-"
-      # - run: |
-      #     echo "module1 version            : ${{ steps.module1-version.outputs.version }}"
-      #     echo "module1 version tag        : ${{ steps.module1-version.outputs.version_tag }}"
-      #     git tag -l --sort=-version:refname "module1*"
-      #     echo "module2 version            : ${{ steps.module2-version.outputs.version }}"
-      #     echo "module2 version tag        : ${{ steps.module2-version.outputs.version_tag }}"
-      #     git tag -l --sort=-version:refname "module2*"
-      #   name: Display semantic versioning variables
+            # check the python script exited ok (a python exception caught will trigger a sys.exit(1) and fail the step/workflow)
+            if [[ $? = 0 ]]; then
+                echo "success"
+            else
+                echo "failure: $?"
+            fi
+      - id: debug_values
+        name: Display Python script output and GitVersion variables (without prefix)
+        run: |
+            echo "PYTHON SCRIPT. NAME: ${{ env.NBS_MODULE_MATRIX_NAME }}         VALUE : ${{ steps.run_script.outputs.MODULES_MATRIX }}"
+            echo "FullSemVer (env.fullSemVer)            : ${{ env.fullSemVer }}"
+            echo "GitVersion_MajorMinorPatch (env.GitVersion_MajorMinorPatch)  : ${{ env.GitVersion_MajorMinorPatch }}"
 
-      # - name: Determine Version
-      #   id: version_step # step id used as reference for output values
-      #   uses: gittools/actions/gitversion/execute@v3.2.0
-      # - name: GitVersion
-      #   id: gitversion
-      #   # Note, gitversion requires fetch_depth of zero to get all history to work on!
-      #   # Means we may need to modify the pull request fetch-depth near the top of this script and rework things...
-      #   # E.g,
-      #   # - name: Checkout
-      #   #   uses: actions/checkout@v4
-      #   #       with:
-      #   #           fetch-depth: 0
-      #   run: |
-      #       # Not well documented but GitVersion exposes all version variables as environment variables in the form GitVersion_<variable_name>
-      #       #which gitversion
-      #       gitversion /output buildserver
-      #       #echo "$GitVersion_MajorMinorPatch"
-      #       #echo $env:GitVersion_MajorMinorPatch
-
-      # - name: Zip top-level folders with their contents
-      #   run: |
-      #       echo ${{ steps.changed-files.outputs.changed_files }} | while read line ; do xargs zip archive.zip $line ; done
-      # - name: Extract some files
-      #   run: |
-      #       # unzip to test folder (might need to create it?)
-      #       7z x archive.zip -otest
-      #       ls
-      #       cd test
-      #       ls -la
-      #       # not for here but just checking tags in the repo
-      #       git tag -l --sort=-version:refname "module1*"
-
-
-
-        
-  # python-test:
-  #   name: test_using_python
-  #   runs-on: ubuntu-latest
-  #   # testing needs dependency and also the getting an output from that job and using it as an environment variable
-  #   needs:
-  #     - get_files
-  #   env:
-  #     OUTPUT1: ${{needs.get_files.outputs.output1}}
-  #   steps:
-  #     # As this is another job the previous checked out code is not present. In this case we have to check the codebase out again as we are on a clean runner
-  #     - uses: actions/checkout@v3
-  #       with:
-  #           fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
-  #     - name: setup python
-  #       uses: actions/setup-python@v5
-  #       with:
-  #         python-version: 3.12
-  #     - name: Run a python script inline
-  #       shell: python
-  #       run: |
-  #         import os
-  #         import sys
-
-  #         print(os.getcwd())
-  #         print("Hello world!")
-  #         print(os.environ['OUTPUT1'])
-  #         sys.exit()
-
-
-
-# on:
-#   pull_request:
-#     branches: [ main ]
-#   push:
-#     branches: [ main ]
-
-# jobs:
-#   get_files:
-#     name: run_on_pr_or_push
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v4
-#         with:
-#           fetch-depth: 0
-
-#       - name: Modified files
-#         run: |
-#           case '${{ github.event_name }}' in
-#             push)
-#               firstCommit='${{ github.event.commits[0].id }}'
-#               lastCommit='${{ github.event.commits[-1].id }}'
-#               ;;
-#             pull_request)
-#               firstCommit='${{ github.event.base_ref }}'
-#               lastCommit='${{ github.event.head_ref }}'
-#               ;;
-#           esac
-#           changedFiles=$(git diff --name-only --diff-filter=d "${firstCommit}~1" "${lastCommit}")
-#           echo "changedFiles: $changedFiles"
-
-
-
-
-
-
-# # This is a basic workflow to help you get started with Actions
-
-# name: CI
-
-# # Controls when the workflow will run
-# on:
-#   # Triggers the workflow on push or pull request events but only for the "main" branch
-#   push:
-#     branches: [ "main" ]
-#   pull_request:
-#     branches: [ "main" ]
-
-#   # Allows you to run this workflow manually from the Actions tab
-#   workflow_dispatch:
-
-# # A workflow run is made up of one or more jobs that can run sequentially or in parallel
-# jobs:
-#   # This workflow contains a single job called "build"
-#   build:
-#     # The type of runner that the job will run on
-#     runs-on: ubuntu-latest
-
-#     # Steps represent a sequence of tasks that will be executed as part of the job
-#     steps:
-#       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-#       - uses: actions/checkout@v4
-
-#       # Runs a single command using the runners shell
-#       - name: Run a one-line script
-#         run: echo Hello, world!
-
-#       # Runs a set of commands using the runners shell
-#       - name: Run a multi-line script
-#         run: |
-#           echo Add other actions to build,
-#           echo test, and deploy your project.
