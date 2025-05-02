@@ -52,13 +52,13 @@ jobs:
         id: bash_modules
         run: |
 
-            modules=$(echo "${{ steps.build_changed_files.outputs.changed_files }}" | grep "^modules/" || true)
-            if [[ ! -z "$modules" ]]; then
+            modules_check=$(echo "${{ steps.build_changed_files.outputs.changed_files }}" | grep "^modules/" || true)
+            if [[ ! -z "$modules_check" ]]; then
                 echo "HERE"
-                modules=$(echo "$modules" | sed -e "s!modules/!!" | xargs -n1 dirname | uniq)
+                modules_list=$(echo "$modules_check" | sed -e "s!modules/!!" | xargs -n1 dirname | uniq)
             fi
-            echo "changed_modules=$modules"
-            echo "modules_list=[\"${changed_modules// /\",\"}\"]" >> $GITHUB_OUTPUT
+            echo "changed_modules=$modules_list"
+            echo "modules_list_output=[\"${changed_modules// /\",\"}\"]" >> $GITHUB_OUTPUT
 
       - id: install_gitversion
         name: Install GitVersion
@@ -80,7 +80,7 @@ jobs:
         run: |
             echo "Module 1 Next version is ${{ steps.version_step_module1.outputs.MajorMinorPatch }}"
             echo "Changed Modules: ${{ steps.bash_modules.outputs.changed_modules }}"
-            echo "Modules List: ${{ steps.bash_modules.outputs.modules_list }}"
+            echo "Modules List Output: ${{ steps.bash_modules.outputs.modules_list_output }}"
 
       # - id: python_call_gitversion
       #   name: Calling GitVersion from python
