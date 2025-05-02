@@ -88,7 +88,7 @@ jobs:
         shell: python
         run: |
           import subprocess
-          result = subprocess.run(['${{ GITVERSION_PATH }}/GitVersion', '/overrideconfig', 'tag-prefix=module1-'], stdout=subprocess.PIPE)
+          result = subprocess.run(['${{ env.GITVERSION_PATH }}/GitVersion', '/overrideconfig', 'tag-prefix=module1-'], stdout=subprocess.PIPE)
           output = result.stdout.decode().strip()
           print(result.stdout)
           print(result.stdout.decode())
