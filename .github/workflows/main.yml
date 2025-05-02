@@ -87,7 +87,7 @@ jobs:
             # causes failure if python script fails
             set -e
 
-            echo "ENV TEST: ${{ NBS_MODULE_MATRIX_NAME }}"
+            echo "ENV TEST: ${{ env.NBS_MODULE_MATRIX_NAME }}"
             # Note, -o defines the name of a variable that is added to GITHUB_OUTPUT with the python script output
             python3 .github/scripts/test.py -f "$CHANGED_FILES" -o "MODULES_MATRIX"
 
