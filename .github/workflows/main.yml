@@ -51,11 +51,9 @@ jobs:
       - name: bash handle module files
         id: bash_modules
         run: |
-
-            modules_check=$(echo "${{ steps.build_changed_files.outputs.changed_files }}" | grep "^modules/" || true)
-            if [[ ! -z "$modules_check" ]]; then
-                echo "HERE"
-                modules_list=$(echo "$modules_check" | sed -e "s!modules/!!" | xargs -n1 dirname | uniq)
+            modules_parsed=$(echo "${{ steps.build_changed_files.outputs.changed_files }}" | grep "^modules/" || true)
+            if [[ ! -z "$modules" ]]; then
+                modules_list=$(echo "$modules_parsed" | sed -e "s!modules/!!" | xargs -n1 dirname | uniq)
             fi
             echo "changed_modules=$modules_list"
             echo "modules_list_output=[\"${changed_modules// /\",\"}\"]" >> $GITHUB_OUTPUT
@@ -78,6 +76,11 @@ jobs:
       - id: check_module1_version
         name: Debug check of module1's next version to use
         run: |
+            for file in ${{ steps.build_changed_files.outputs.changed_files }}; do
+                echo "$file was changed"
+            done
+            echo "changed modules are: ${{ steps.bash_modules.outputs.changed_modules }}"
+            
             echo "Module 1 Next version is ${{ steps.version_step_module1.outputs.MajorMinorPatch }}"
             echo "Changed Modules: ${{ steps.bash_modules.outputs.changed_modules }}"
             echo "Modules List Output: ${{ steps.bash_modules.outputs.modules_list_output }}"
