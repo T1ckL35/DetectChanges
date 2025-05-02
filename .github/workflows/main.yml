@@ -18,7 +18,7 @@ jobs:
     # Map a step output to a job output. A shortcut way to defining a variable instead of the full path
     #     e.g, 
     outputs:
-      matrix: ${{ steps.run_script.outputs.dynamic_list }}    # Will be used in another job to run module tests with
+      matrix: ${{ steps.run_script.outputs.MODULES_MATRIX }}    # Will be used in another job to run module tests with
     env:
       NBS_MODULE_MATRIX_NAME: "MODULES_MATRIX"                # Defines the variable name in GITHUB_OUTPUT that the python modules script outputs the data to
     steps:
