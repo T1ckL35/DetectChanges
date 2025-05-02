@@ -54,6 +54,7 @@ jobs:
 
             modules=$(echo "${{ steps.build_changed_files.outputs.changed_files }}" | grep "^modules/" || true)
             if [[ ! -z "$modules" ]]; then
+                echo "HERE"
                 modules=$(echo "$modules" | sed -e "s!modules/!!" | xargs -n1 dirname | uniq)
             fi
             echo "changed_modules=$modules"
