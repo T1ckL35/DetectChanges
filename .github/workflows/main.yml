@@ -63,6 +63,11 @@ jobs:
             overrideConfig: |
                 tag-prefix=module1-
 
+      - id: check_module1_version
+        name: Debug check of module1's next version to use
+        run: |
+            echo "Module 1 Next version is ${{ steps.version_step_module1.outputs.MajorMinorPatch }}"
+
       - id: setup_python
         name: Set up Python to use
         uses: actions/setup-python@v5
@@ -97,6 +102,7 @@ jobs:
             echo "GitVersion_MajorMinorPatch (env.GitVersion_MajorMinorPatch)  : ${{ env.GitVersion_MajorMinorPatch }}"
 
       - id: version_step_module2 # step id used as reference for output values
+        # NOTE: this creates/overwrites env vars, so if run multiple times it will only use the latest env var values based on the tag-prefix defined!
         name: Determine Module 2 Version. Todo is make this dynamic
         uses: gittools/actions/gitversion/execute@v3.2.1
         with:
@@ -107,3 +113,8 @@ jobs:
             #targetPath: "modules/module2"
             overrideConfig: |
                 tag-prefix=module2-
+
+      - id: check_module2_version
+        name: Debug check of module2's next version to use
+        run: |
+            echo "Module 2 Next version is ${{ steps.version_step_module2.outputs.MajorMinorPatch }}"
