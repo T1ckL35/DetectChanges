@@ -48,6 +48,18 @@ jobs:
         with:
             fetch-depth: 0
 
+      - name: bash handle module files
+        id: bash-modules
+        run: |
+            modules=$(echo "${{ steps.changed-files.outputs.changed_files }}" | grep "^modules/" || true)
+            if [[ ! -z "$modules" ]]; then
+                modules=$(echo "$modules" | sed -e "s!modules/!!" | xargs -n1 dirname | uniq)
+            fi
+            cleaned_modules = $modules | jq  -R -s -c 'split(" ")' | tr -d '\\n'
+            #echo "changed_modules=$modules"
+            echo "changed_modules=$(echo $modules | jq  -R -s -c 'split(" ")' | tr -d '\\n')"
+            echo $changed_modules
+
       - id: install_gitversion
         name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v3.2.1
