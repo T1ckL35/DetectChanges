@@ -51,7 +51,7 @@ jobs:
       - name: bash handle module files
         id: bash-modules
         run: |
-            modules=$(echo "${{ steps.changed-files.outputs.changed_files }}" | grep "^modules/" || true)
+            modules=$(echo "${{ steps.build_changed_files.outputs.changed_files }}" | grep "^modules/" || true)
             if [[ ! -z "$modules" ]]; then
                 modules=$(echo "$modules" | sed -e "s!modules/!!" | xargs -n1 dirname | uniq)
             fi
