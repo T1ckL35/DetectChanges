@@ -20,6 +20,7 @@ jobs:
     outputs:
       output1: ${{ steps.changed-files.outputs.changed_files }}
       matrix: ${{ steps.changed-files.outputs.matrix }}
+      matrix2: ${{ steps.run_script.outputs.dynamic_list }}
     steps:
       - id: checkout-codebase
         uses: actions/checkout@v4
@@ -82,7 +83,10 @@ jobs:
             #arguments: '/showConfig'
             #overrideConfig: |
             #  mode=MainLine
-
+      - name: setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
       - name: Run script
         id: run_script
         #shell: bash
@@ -90,19 +94,21 @@ jobs:
             SEMVER: ${{ steps.version_step.outputs.MajorMinorPatch }}
             CHANGED_FILES: ${{ steps.changed-files.outputs.changed_files }}
         run: |
-            echo "$SEMVER"
-            # wrapped in quotes to make sure it is passed as a space separated string to python
-            # writes output to Github Env as env.MODULES_JSON2
-            # works # python3 .github/scripts/test.py -f "$CHANGED_FILES"
-            export "MODULES_JSON2=$(python3 .github/scripts/test.py -f \\"$CHANGED_FILES\\" 2>&1)"
-            if [[ $? = 0 ]]; then
-                echo "success"
-            else
-                echo "failure: $?"
-            fi
-            echo "MODULES_JSON2: $MODULES_JSON2"
-            ##echo "serverquery=$(python3 .github/scripts/test.py -f \\"$CHANGED_FILES\\" 2>&1)"
-            #echo "matrix2=$(echo ${{ env.MODULES_JSON }})" >> $GITHUB_OUTPUT
+            python3 .github/scripts/test.py -f "$CHANGED_FILES"
+
+            # echo "$SEMVER"
+            # # wrapped in quotes to make sure it is passed as a space separated string to python
+            # # writes output to Github Env as env.MODULES_JSON2
+            # # works # python3 .github/scripts/test.py -f "$CHANGED_FILES"
+            # export "MODULES_JSON2=$(python3 .github/scripts/test.py -f \\"$CHANGED_FILES\\" 2>&1)"
+            # if [[ $? = 0 ]]; then
+            #     echo "success"
+            # else
+            #     echo "failure: $?"
+            # fi
+            # echo "MODULES_JSON2: $MODULES_JSON2"
+            # ##echo "serverquery=$(python3 .github/scripts/test.py -f \\"$CHANGED_FILES\\" 2>&1)"
+            # #echo "matrix2=$(echo ${{ env.MODULES_JSON }})" >> $GITHUB_OUTPUT
       #- run: |
       #      echo "Module JSON output (env.MODULES_JSON2)            : ${{ env.MODULES_JSON2 }}"
       - run: |

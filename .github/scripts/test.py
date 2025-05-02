@@ -77,7 +77,7 @@ class PackageModule:
         if "GITHUB_OUTPUT" in os.environ:
             # Write to GITHUB_OUTPUT
             with open(os.environ["GITHUB_OUTPUT"], "a") as fh:
-                print(f"MODULES_JSON2={str(json.dumps(modules_tojson))}", file=fh)
+                print(f"dynamic_list={str(json.dumps(modules_tojson))}", file=fh)
 
         """
         if self.args.output == "gh":
