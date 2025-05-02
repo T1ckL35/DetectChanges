@@ -53,10 +53,11 @@ jobs:
         run: |
             modules=$(echo "${{ steps.build_changed_files.outputs.changed_files }}" | grep "^modules/" || true)
             if [[ ! -z "$modules" ]]; then
-                modules=$(echo "$modules" | sed -e "s!modules/!!" | xargs -n1 dirname | uniq)
+                modules_spaces=$(echo "$modules" | sed -e "s!modules/!!" | xargs -n1 dirname | uniq)
             fi
+            echo "modules_list=[\"${modules_spaces// /\",\"}\"]" >> $GITHUB_OUTPUT
             #cleaned_modules = $modules | jq  -R -s -c 'split(" ")' | tr -d '\\n'
-            echo "modules_json_list=$(echo $modules | jq  -R -s -c 'split(" ")' | tr -d '\\n')" >> $GITHUB_OUTPUT
+            #echo "modules_json_list=$(echo $modules | jq  -R -s -c 'split(" ")' | tr -d '\\n')" >> $GITHUB_OUTPUT
 
       - id: install_gitversion
         name: Install GitVersion
@@ -77,7 +78,7 @@ jobs:
         name: Debug check of module1's next version to use
         run: |
             echo "Module 1 Next version is ${{ steps.version_step_module1.outputs.MajorMinorPatch }}"
-            echo "Module Json List: ${{ steps.bash_modules.outputs.modules_json_list }}"
+            echo "Modules List: ${{ steps.bash_modules.outputs.modules_list }}"
 
       # - id: python_call_gitversion
       #   name: Calling GitVersion from python
