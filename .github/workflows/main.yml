@@ -10,8 +10,8 @@ on:
        - 'modules/**'
 
 jobs:
-  get_files:
-    name: run_on_pr_or_push
+  build_configuration:
+    name: Build Configuration
     runs-on: ubuntu-latest
     # To add in at some point
     # if: github.event.pull_request.merged == true
@@ -118,3 +118,11 @@ jobs:
         name: Debug check of module2's next version to use
         run: |
             echo "Module 2 Next version is ${{ steps.version_step_module2.outputs.MajorMinorPatch }}"
+
+  run_tests:
+    name: run_tests
+    runs-on: ubuntu-latest
+    needs:
+      - build_configuration
+    steps:
+      - run: echo '${{ toJSON(needs.build_configuration.outputs) }}'
