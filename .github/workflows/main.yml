@@ -42,7 +42,7 @@ jobs:
                 export changed_modules=$( git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- modules | grep -E 'modules/.*/'  | cut -d/ -f2 | uniq)
             fi
             echo "$changed_modules"
-            echo "modules_list_output=[\""${changed_modules// /\",\"}\""]" >> $GITHUB_OUTPUT
+            echo "modules_list_output=[\"${changed_modules// /\",\"}\"]" | jq >> $GITHUB_OUTPUT
             ##echo "modules_list_output=$(echo [\"${modules_spaces// /\",\"}\"])" >> $GITHUB_OUTPUT
             # TODO: Monday - pass this list to a job that goes off and checks the next module version tag/release
 
