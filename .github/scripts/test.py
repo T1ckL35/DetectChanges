@@ -27,9 +27,9 @@ class PackageModule:
         logging.info('PackageModule configuring input...')
         parser = argparse.ArgumentParser()
         # required = parser.add_argument_group('required arguments')
-        parser.add_argument("-f", "--files", help="string of space separated file paths that have been updated.")
+        # parser.add_argument("-f", "--files", help="string of space separated file paths that have been updated.")
         # optional to control the output type
-        ###parser.add_argument("-o", "--output", nargs='?', default="gh", help="output type. Options: 'gh' (default), 'py_module', 'json'.")
+        parser.add_argument("-o", "--output", nargs='?', default="PYTHON_OUTPUT", help="output type. If used then pushes the output from this script into the environment variable GITHUB_OUTPUT. Intended to be used in a Github Actions workflow.")
         self.args = parser.parse_args()
         logging.info(f"Input args: {self.args}")
 
@@ -69,31 +69,20 @@ class PackageModule:
 
                     modules_tojson.append(module_info)
 
-        #print(modules_list)
         #print(json.dumps(modules_tojson, indent=2))
-        self.args.output = "AZDSFD" # TEMP HARDCODE
 
         # Catch so this only runs in GitHub Actions
         if "GITHUB_OUTPUT" in os.environ:
-            # Write to GITHUB_OUTPUT
+            # Write to GITHUB_OUTPUT as a variable named from the -o argument passed into this script
             with open(os.environ["GITHUB_OUTPUT"], "a") as fh:
-                #print(f"dynamic_list={"HELLO"}", file=fh)
-                print(f"dynamic_list={str(json.dumps(modules_tojson))}", file=fh)
-
-        """
-        if self.args.output == "gh":
-            # write to the Github environment variable so it can be subsequently used in the github workflow
-            with open(os.environ["GITHUB_ENV"], "a") as fh:
-                fh.write(f"MODULES_JSON2='{json.dumps(modules_tojson)}'")
-                #print(f"MODULES_JSON2={json.dumps(modules_tojson)}\n")
-        elif self.args.output == "py_module":
+                # example output: 'MY_VAR=[{module_name: module1, tests: [unit, bdd]},{module_name: module2}]'
+                # note, if -o or --output is not supplied to the script the the default GITHUB_OUTPUT variable will be named PYTHON_OUTPUT
+                #       if using multiple python scripts then this needs to change otherwise the next script will overwrite the output of the one before!
+                print(f"{self.args.output}={str(json.dumps(modules_tojson))}", file=fh)
+        else:
             # called by a python script/module so returning the dictionary object
             return modules_tojson
-        else:
-            print(json.dumps(modules_tojson))
-            ## otherwise just dump a pretty json object to the screen
-            #print(json.dumps(modules_tojson, indent=2))
-        """
+
 
     def get_tests_list(self, module_tests_path):
         """
@@ -107,7 +96,6 @@ class PackageModule:
             if os.path.isdir(test_path):
                 detected_tests.append(test_name)
         return detected_tests
-
 
 
     def check_for_matching_folders(self, module_path, matches=[]):
