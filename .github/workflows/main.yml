@@ -22,13 +22,16 @@ jobs:
     env:
       NBS_MODULE_MATRIX_NAME: "MODULES_MATRIX"                # Defines the variable name in GITHUB_OUTPUT that the python modules script outputs the data to
     steps:
+
       - id: checkout-codebase
+        name: Checks out the codebase as needed. If this is a PR then it uses a fetch-depth of 2 to determine the changes. Otherwise the fetch-depth is 0 to get the full git history
         uses: actions/checkout@v4
         with:
             # Note, if a depth of 2 is used then we will need to checkout again with a depth of zero in a later step so that GitVersion has the full repo history to be able to create a semver version with..
             fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
-      - name: Get changed files
-        id: changed-files
+
+      - id: build_changed_files
+        name: Builds a list of changed modules and their files. Output to 'changed_files' variable
         run: |
             # Pushes output to $GITHUB_OUTPUT so it can be used in other jobs/steps
             if ${{ github.event_name == 'pull_request' }}; then
@@ -36,6 +39,7 @@ jobs:
             else
                 echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
             fi
+
       - id: recheckout_fetch_depth_0_if_needed
         name: Re-checkout repo if not all history is present (this only runs on PR)
         # required as GitVersion needs a fetch-depth of 0 to work properly
@@ -43,11 +47,13 @@ jobs:
         uses: actions/checkout@v4
         with:
             fetch-depth: 0
+
       - id: install_gitversion
         name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v3.2.1
         with:
             versionSpec: '6.2.x'
+
       - id: version_step_module1 # step id used as reference for output values
         name: Determine Module 1 Version. Todo is make this dynamic
         uses: gittools/actions/gitversion/execute@v3.2.1
@@ -56,6 +62,39 @@ jobs:
             #   This is the only way it seems to honor using a tag-prefix config value
             overrideConfig: |
                 tag-prefix=module1-
+
+      - id: setup_python
+        name: Set up Python to use
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      - id: run_script
+        name: Run script
+        env:
+            SEMVER: ${{ steps.version_step_module1.outputs.MajorMinorPatch }}    # example of pulling in a previous step's variable as an environment variable in this step. Not currently used.
+        run: |
+            # causes failure if python script fails
+            set -e
+
+            # Note, -o defines the name of a variable that is added to GITHUB_OUTPUT with the python script output
+            python3 .github/scripts/test.py -f "${{ steps.build_changed_files.outputs.changed_files }}" -o "${{ env.NBS_MODULE_MATRIX_NAME }}"
+
+            # check the python script exited ok (a python exception caught will trigger a sys.exit(1) and fail the step/workflow)
+            if [[ $? = 0 ]]; then
+                echo "success"
+            else
+                echo "failure: $?"
+            fi
+
+      - id: debug_values
+        name: Display Python script output and GitVersion variables (without prefix)
+        run: |
+            echo "PYTHON SCRIPT. NAME: ${{ env.NBS_MODULE_MATRIX_NAME }}         VALUE : ${{ steps.run_script.outputs.MODULES_MATRIX }}"
+            # The variables below result from GitVersion running and pushing it's findings into environment variables...
+            # note, if GitVersion is run multiple times then it will overwrit these variables each time for this job
+            echo "FullSemVer (env.fullSemVer)            : ${{ env.fullSemVer }}"
+            echo "GitVersion_MajorMinorPatch (env.GitVersion_MajorMinorPatch)  : ${{ env.GitVersion_MajorMinorPatch }}"
 
       - id: version_step_module2 # step id used as reference for output values
         name: Determine Module 2 Version. Todo is make this dynamic
@@ -68,33 +107,3 @@ jobs:
             #targetPath: "modules/module2"
             overrideConfig: |
                 tag-prefix=module2-
-
-      - id: setup_python
-        name: Set up Python to use
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.12
-      - id: run_script
-        name: Run script
-        env:
-            SEMVER: ${{ steps.version_step.outputs.MajorMinorPatch }}    # example of pulling in a previous step's variable as an environment variable in this step
-        run: |
-            # causes failure if python script fails
-            set -e
-
-            # Note, -o defines the name of a variable that is added to GITHUB_OUTPUT with the python script output
-            python3 .github/scripts/test.py -f "${{ steps.changed-files.outputs.changed_files }}" -o "${{ env.NBS_MODULE_MATRIX_NAME }}"
-
-            # check the python script exited ok (a python exception caught will trigger a sys.exit(1) and fail the step/workflow)
-            if [[ $? = 0 ]]; then
-                echo "success"
-            else
-                echo "failure: $?"
-            fi
-      - id: debug_values
-        name: Display Python script output and GitVersion variables (without prefix)
-        run: |
-            echo "PYTHON SCRIPT. NAME: ${{ env.NBS_MODULE_MATRIX_NAME }}         VALUE : ${{ steps.run_script.outputs.MODULES_MATRIX }}"
-            echo "FullSemVer (env.fullSemVer)            : ${{ env.fullSemVer }}"
-            echo "GitVersion_MajorMinorPatch (env.GitVersion_MajorMinorPatch)  : ${{ env.GitVersion_MajorMinorPatch }}"
-
