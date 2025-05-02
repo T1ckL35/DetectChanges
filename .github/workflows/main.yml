@@ -80,8 +80,9 @@ jobs:
         name: Debug check of module1's next version to use
         run: |
             echo "Module 1 Next version is ${{ steps.version_step_module1.outputs.MajorMinorPatch }}"
-            echo "which gitversion"
-            echo "which GitVersion"
+            which gitversion
+            which GitVersion
+            ls -la "${{ env.GITVERSION_PATH }}"
 
       - id: python_call_gitversion
         name: Calling GitVersion from python
