@@ -49,17 +49,14 @@ jobs:
             fetch-depth: 0
 
       - name: bash handle module files
-        id: bash-modules
+        id: bash_modules
         run: |
             modules=$(echo "${{ steps.build_changed_files.outputs.changed_files }}" | grep "^modules/" || true)
             if [[ ! -z "$modules" ]]; then
                 modules=$(echo "$modules" | sed -e "s!modules/!!" | xargs -n1 dirname | uniq)
             fi
             #cleaned_modules = $modules | jq  -R -s -c 'split(" ")' | tr -d '\\n'
-            echo "changed_modules=$modules"
-            echo "$modules | jq  -R -s -c 'split(" ")' | tr -d '\\n'"
-            echo "changed_modules=$(echo $modules | jq  -R -s -c 'split(" ")' | tr -d '\\n')"
-            echo $changed_modules
+            echo "modules_json_list=$(echo $mylines | jq  -R -s -c 'split(\" \")' | tr -d '\\n')" >> $GITHUB_OUTPUT
 
       - id: install_gitversion
         name: Install GitVersion
@@ -80,21 +77,19 @@ jobs:
         name: Debug check of module1's next version to use
         run: |
             echo "Module 1 Next version is ${{ steps.version_step_module1.outputs.MajorMinorPatch }}"
-            which gitversion
-            which GitVersion
-            ls -la "${{ env.GITVERSION_PATH }}"
+            echo "Module Json List: ${{ steps.bash_modules.outputs.modules_json_list }}"
 
-      - id: python_call_gitversion
-        name: Calling GitVersion from python
-        shell: python
-        run: |
-          import subprocess
-          result = subprocess.run(['${{ env.GITVERSION_PATH }}/GitVersion', '/overrideconfig', 'tag-prefix=module1-'], stdout=subprocess.PIPE)
-          output = result.stdout.decode().strip()
-          print(result.stdout)
-          print(result.stdout.decode())
-          print(result.stdout.decode().strip())
-          # return output.split(' - ')[0], output.split(' - ')[1]
+      # - id: python_call_gitversion
+      #   name: Calling GitVersion from python
+      #   shell: python
+      #   run: |
+      #     import subprocess
+      #     result = subprocess.run(['${{ env.GITVERSION_PATH }}/GitVersion', '/overrideconfig', 'tag-prefix=module1-'], stdout=subprocess.PIPE)
+      #     output = result.stdout.decode().strip()
+      #     print(result.stdout)
+      #     print(result.stdout.decode())
+      #     print(result.stdout.decode().strip())
+      #     # return output.split(' - ')[0], output.split(' - ')[1]
 
       - id: setup_python
         name: Set up Python to use
