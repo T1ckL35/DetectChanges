@@ -57,6 +57,7 @@ jobs:
             fi
             #cleaned_modules = $modules | jq  -R -s -c 'split(" ")' | tr -d '\\n'
             #echo "changed_modules=$modules"
+            echo $modules | jq  -R -s -c 'split(" ")' | tr -d '\\n'
             echo "changed_modules=$(echo $modules | jq  -R -s -c 'split(" ")' | tr -d '\\n')"
             echo $changed_modules
 
