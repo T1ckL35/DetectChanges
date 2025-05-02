@@ -116,6 +116,7 @@ if __name__ == "__main__":
         #print(os.getcwd())
         app = PackageModule()
         # app.output_logging()
+        sys.exit(1)
         app.run()
     except Exception as e:
         print("EXCEPTION ENCOUNTERED:")

@@ -94,6 +94,8 @@ jobs:
             SEMVER: ${{ steps.version_step.outputs.MajorMinorPatch }}
             CHANGED_FILES: ${{ steps.changed-files.outputs.changed_files }}
         run: |
+            # causes failure if python script fails
+            set e
             python3 .github/scripts/test.py -f "$CHANGED_FILES" -o "MODULES_MATRIX"
             # check the python script exited ok (a python exception caught will trigger a sys.exit(1))
             if [[ $? = 0 ]]; then
