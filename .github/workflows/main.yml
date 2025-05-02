@@ -36,9 +36,13 @@ jobs:
             # Pushes output to $GITHUB_OUTPUT so it can be used in other jobs/steps
             if ${{ github.event_name == 'pull_request' }}; then
                 echo "changed_files=$(git diff --name-only -r HEAD^1 HEAD | xargs)" >> $GITHUB_OUTPUT
+                export CHANGED_MODULES=$( git diff --name-only origin/$GITHUB_BASE_REF ${{ github.event.after }} -- modules | grep -E 'modules/.*/' | cut -d/ -f2 | uniq)
             else
                 echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
+                export CHANGED_MODULES=$( git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- modules | grep -E 'modules/.*/'  | cut -d/ -f2 | uniq)
             fi
+            echo "$CHANGED_MODULES"
+            # TODO: Monday - pass this list to a job that goes off and checks the next module version tag/release
 
       - id: recheckout_fetch_depth_0_if_needed
         name: Re-checkout repo if not all history is present (this only runs on PR)
@@ -80,7 +84,7 @@ jobs:
                 echo "$file was changed"
             done
             echo "changed modules are: ${{ steps.bash_modules.outputs.changed_modules }}"
-            
+
             echo "Module 1 Next version is ${{ steps.version_step_module1.outputs.MajorMinorPatch }}"
             echo "Changed Modules: ${{ steps.bash_modules.outputs.changed_modules }}"
             echo "Modules List Output: ${{ steps.bash_modules.outputs.modules_list_output }}"
