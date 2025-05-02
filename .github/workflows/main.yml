@@ -89,7 +89,7 @@ jobs:
 
             echo "ENV TEST: ${{ env.NBS_MODULE_MATRIX_NAME }}"
             # Note, -o defines the name of a variable that is added to GITHUB_OUTPUT with the python script output
-            python3 .github/scripts/test.py -f "$CHANGED_FILES" -o "MODULES_MATRIX"
+            python3 .github/scripts/test.py -f "$CHANGED_FILES" -o "${{ env.NBS_MODULE_MATRIX_NAME }}"
 
             # check the python script exited ok (a python exception caught will trigger a sys.exit(1) and fail the step/workflow)
             if [[ $? = 0 ]]; then
@@ -98,7 +98,7 @@ jobs:
                 echo "failure: $?"
             fi
       - run: |
-            echo "MODULES_MATRIX          : ${{ steps.run_script.outputs.MODULES_MATRIX }}"
+            echo "MODULES_MATRIX: NAME: ${{ env.NBS_MODULE_MATRIX_NAME }}         VALUE : ${{ steps.run_script.outputs.MODULES_MATRIX }}"
             echo "FullSemVer (env.fullSemVer)            : ${{ env.fullSemVer }}"
             echo "GitVersion_MajorMinorPatch (env.GitVersion_MajorMinorPatch)  : ${{ env.GitVersion_MajorMinorPatch }}"
         name: Display GitVersion variables (without prefix)
