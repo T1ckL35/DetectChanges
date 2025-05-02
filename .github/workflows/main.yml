@@ -95,17 +95,19 @@ jobs:
             CHANGED_FILES: ${{ steps.changed-files.outputs.changed_files }}
         run: |
             python3 .github/scripts/test.py -f "$CHANGED_FILES" -o "MODULES_MATRIX"
+            # check the python script exited ok (a python exception caught will trigger a sys.exit(1))
+            if [[ $? = 0 ]]; then
+                echo "success"
+            else
+                echo "failure: $?"
+            fi
 
             # echo "$SEMVER"
             # # wrapped in quotes to make sure it is passed as a space separated string to python
             # # writes output to Github Env as env.MODULES_JSON2
             # # works # python3 .github/scripts/test.py -f "$CHANGED_FILES"
             # export "MODULES_JSON2=$(python3 .github/scripts/test.py -f \\"$CHANGED_FILES\\" 2>&1)"
-            # if [[ $? = 0 ]]; then
-            #     echo "success"
-            # else
-            #     echo "failure: $?"
-            # fi
+
             # echo "MODULES_JSON2: $MODULES_JSON2"
             # ##echo "serverquery=$(python3 .github/scripts/test.py -f \\"$CHANGED_FILES\\" 2>&1)"
             # #echo "matrix2=$(echo ${{ env.MODULES_JSON }})" >> $GITHUB_OUTPUT
