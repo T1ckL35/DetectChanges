@@ -55,7 +55,7 @@ jobs:
             if [[ ! -z "$modules" ]]; then
                 modules=$(echo "$modules" | sed -e "s!modules/!!" | xargs -n1 dirname | uniq)
             fi
-            cleaned_modules = $modules | jq  -R -s -c 'split(" ")' | tr -d '\\n'
+            #cleaned_modules = $modules | jq  -R -s -c 'split(" ")' | tr -d '\\n'
             #echo "changed_modules=$modules"
             echo "changed_modules=$(echo $modules | jq  -R -s -c 'split(" ")' | tr -d '\\n')"
             echo $changed_modules
