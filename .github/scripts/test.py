@@ -73,6 +73,13 @@ class PackageModule:
         #print(json.dumps(modules_tojson, indent=2))
         self.args.output = "AZDSFD" # TEMP HARDCODE
 
+        # Catch so this only runs in GitHub Actions
+        if "GITHUB_OUTPUT" in os.environ:
+            # Write to GITHUB_OUTPUT
+            with open(os.environ["GITHUB_OUTPUT"], "a") as fh:
+                print(f"MODULES_JSON2={str(json.dumps(modules_tojson))}", file=fh)
+
+        """
         if self.args.output == "gh":
             # write to the Github environment variable so it can be subsequently used in the github workflow
             with open(os.environ["GITHUB_ENV"], "a") as fh:
@@ -85,6 +92,7 @@ class PackageModule:
             print(json.dumps(modules_tojson))
             ## otherwise just dump a pretty json object to the screen
             #print(json.dumps(modules_tojson, indent=2))
+        """
 
     def get_tests_list(self, module_tests_path):
         """
