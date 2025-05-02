@@ -81,6 +81,18 @@ jobs:
         run: |
             echo "Module 1 Next version is ${{ steps.version_step_module1.outputs.MajorMinorPatch }}"
 
+      - id: python_call_gitversion
+        name: Calling GitVersion from python
+        shell: python
+        run: |
+          import subprocess
+          result = subprocess.run(['gitversion', '/overrideconfig', 'tag-prefix=module1-', stdout=subprocess.PIPE)
+          output = result.stdout.decode().strip()
+          print(result.stdout)
+          print(result.stdout.decode())
+          print(result.stdout.decode().strip())
+          # return output.split(' - ')[0], output.split(' - ')[1]
+
       - id: setup_python
         name: Set up Python to use
         uses: actions/setup-python@v5
