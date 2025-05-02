@@ -55,7 +55,9 @@ jobs:
             if [[ ! -z "$modules" ]]; then
                 modules_spaces=$(echo "$modules" | sed -e "s!modules/!!" | xargs -n1 dirname | uniq)
             fi
+            echo $modules_spaces
             echo "modules_list=[\"${modules_spaces// /\",\"}\"]" >> $GITHUB_OUTPUT
+            echo $modules_list
             #cleaned_modules = $modules | jq  -R -s -c 'split(" ")' | tr -d '\\n'
             #echo "modules_json_list=$(echo $modules | jq  -R -s -c 'split(" ")' | tr -d '\\n')" >> $GITHUB_OUTPUT
 
