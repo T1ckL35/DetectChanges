@@ -113,6 +113,7 @@ jobs:
       #      echo "Module JSON output (env.MODULES_JSON2)            : ${{ env.MODULES_JSON2 }}"
       - run: |
             echo "Module JSON output (env.MODULES_JSON2)            : ${{ env.MODULES_JSON2 }}"
+            echo "dynamic list          : ${{ steps.run_script.outputs.dynamic_list }}"
             echo "FullSemVer (env.fullSemVer)            : ${{ env.fullSemVer }}"
             echo "GitVersion_MajorMinorPatch (env.GitVersion_MajorMinorPatch)  : ${{ env.GitVersion_MajorMinorPatch }}"
         name: Display GitVersion variables (without prefix)
