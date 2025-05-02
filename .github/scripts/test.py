@@ -27,7 +27,7 @@ class PackageModule:
         logging.info('PackageModule configuring input...')
         parser = argparse.ArgumentParser()
         # required = parser.add_argument_group('required arguments')
-        # parser.add_argument("-f", "--files", help="string of space separated file paths that have been updated.")
+        parser.add_argument("-f", "--files", help="string of space separated file paths that have been updated.")
         # optional to control the output type
         parser.add_argument("-o", "--output", nargs='?', default="PYTHON_OUTPUT", help="output type. If used then pushes the output from this script into the environment variable GITHUB_OUTPUT. Intended to be used in a Github Actions workflow.")
         self.args = parser.parse_args()
