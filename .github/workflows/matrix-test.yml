@@ -65,6 +65,7 @@ jobs:
           path: reports/
           pattern: report-*
           merge-multiple: true
+      - run: ls reports/report-*
       - run: cat reports/report-*
 
           
