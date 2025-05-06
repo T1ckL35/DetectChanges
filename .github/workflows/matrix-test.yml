@@ -22,12 +22,55 @@ on:
       #   required: true
 
 jobs:
+
+  build_configuration:
+    name: Build Configuration
+    runs-on: ubuntu-latest
+    # To add in at some point
+    # if: github.event.pull_request.merged == true
+    # Map a step output to a job output. A shortcut way to defining a variable instead of the full path
+    #     e.g, 
+    #outputs:
+    #  matrix: ${{ steps.run_script.outputs.MODULES_MATRIX }}    # Will be used in another job to run module tests with
+    outputs:
+      modules_json_list: ${{ steps.build_changed_files.outputs.modules_list_output }}
+    #env:
+    #  NBS_MODULE_MATRIX_NAME: "MODULES_MATRIX"                # Defines the variable name in GITHUB_OUTPUT that the python modules script outputs the data to
+    steps:
+      - id: checkout-codebase
+        name: Checks out the codebase as needed. If this is a PR then it uses a fetch-depth of 2 to determine the changes. Otherwise the fetch-depth is 0 to get the full git history
+        uses: actions/checkout@v4
+        with:
+            # Note, if a depth of 2 is used then we will need to checkout again with a depth of zero in a later step so that GitVersion has the full repo history to be able to create a semver version with..
+            fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
+
+      - id: build_changed_files
+        name: Builds a list of changed modules and their files. Output to 'changed_files' variable
+        run: |
+            # Pushes output to $GITHUB_OUTPUT so it can be used in other jobs/steps
+            if ${{ github.event_name == 'pull_request' }}; then
+                echo "changed_files=$(git diff --name-only -r HEAD^1 HEAD | xargs)" >> $GITHUB_OUTPUT
+                export changed_modules=$( git diff --name-only origin/$GITHUB_BASE_REF ${{ github.event.after }} -- modules | grep -E 'modules/.*/' | cut -d/ -f2 | uniq)
+            else
+                echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
+                export changed_modules=$( git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- modules | grep -E 'modules/.*/'  | cut -d/ -f2 | uniq)
+            fi
+            echo "$changed_modules"
+            echo "modules_list_output=$(echo "$changed_modules" | jq  --raw-input .  | jq --slurp . | jq -c .)"  >> $GITHUB_OUTPUT       # testing friday pm
+            #modules_list_changes=$(echo "$changed_modules" | jq  --raw-input .  | jq --slurp .)
+            #echo "modules_list_output=$modules_list_changes" >> $GITHUB_OUTPUT
+
+
   get-changed-next-module-versions:
     runs-on: ubuntu-latest
+    needs:
+      - build_configuration
+    #env:
+    #  OUTPUT1: ${{needs.get_files.outputs.output1}}
     strategy:
       fail-fast: false
       matrix:
-        module_name: ["module1", "module2"]
+        module_name: ${{ fromJSON(needs.build_configuration.outputs.modules_json_list) }}    # ["module1", "module2"]
     steps:
       - id: checkout-codebase
         name: Checks out the codebase as needed
