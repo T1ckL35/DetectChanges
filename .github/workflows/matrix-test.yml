@@ -38,7 +38,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shardIndex: [1, 2, 3, 4]
+        shardIndex: ["1", "2", "3", "4"]    # trying strings as it doesn't seem to work with integers...
     steps:
       # Needs to checkout the codebase for the artifact upload to work here. Strange
       #- uses: actions/checkout@v4
@@ -68,7 +68,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: reports
-          pattern: report-*.txt
+          pattern: report-*
           merge-multiple: true
       - run: ls -R *
       - name: Display structure of downloaded files
