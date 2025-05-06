@@ -33,6 +33,11 @@ jobs:
   #       name: my-artifact
   #       path: reports/test/world.txt
 
+  install_gitversion:
+    runs-on: ubuntu-latest
+    steps:
+
+
   run-tests:
     runs-on: ubuntu-latest
     strategy:
@@ -40,9 +45,31 @@ jobs:
       matrix:
         module_name: ["module1", "module2"]
     steps:
+      - id: checkout-codebase
+        name: Checks out the codebase as needed
+        uses: actions/checkout@v4
+        with:
+            fetch-depth: 0
+      - id: install_gitversion
+        name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v3.2.1
+        with:
+            versionSpec: '6.2.x'
+      - id: version_step_module # step id used as reference for output values
+        name: Determine Module Version. Todo is make this dynamic
+        uses: gittools/actions/gitversion/execute@v3.2.1
+        with:
+            # NOTE: Tried specifying a configfile in the module's folder but it does NOT work.
+            #   This is the only way it seems to honor using a tag-prefix config value
+            overrideConfig: |
+                tag-prefix=${{ matrix.module_name }}-
+      - id: check_module_version
+        name: Debug check of module1's next version to use
+        run: |
+          echo "Module 1 Next version is ${{ steps.version_step_module.outputs.MajorMinorPatch }}"
       - run: mkdir -p module_versions
       - name: Create a File
-        run: echo "${{ matrix.module_name }}-x.x.x" > module_versions/${{ matrix.module_name }}.txt
+        run: echo "${{ matrix.module_name }}-${{ steps.version_step_module.outputs.MajorMinorPatch }}" > module_versions/${{ matrix.module_name }}.txt
       # Needs to checkout the codebase for the artifact upload to work here. Strange
       #- uses: actions/checkout@v4
       - name: Upload blob report to GitHub Actions Artifacts
