@@ -63,7 +63,7 @@ jobs:
           path: reports/
           pattern: report-*
           merge-multiple: true
-      - run: cat report-*
+      - run: cat reports/report-*
 
           
       # # https://github.com/actions/runner/pull/2477
