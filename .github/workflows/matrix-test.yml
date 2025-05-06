@@ -125,6 +125,7 @@ jobs:
 
       # Handle multiple file wildcards in the command
       - run: echo "module_next_versions=$(for file in module_versions/module*; do cat $file; done)" >> $GITHUB_OUTPUT
+      - run: echo "module_next_versions=\"$(for file in module_versions/module*; do cat $file; done | tr '\n' ' ' | xargs)"\" >> $GITHUB_OUTPUT
 
 
       #- run: echo "module_next_versions=$(cat module_versions/module*)" >> $GITHUB_OUTPUT
