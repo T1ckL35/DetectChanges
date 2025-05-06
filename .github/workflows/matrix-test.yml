@@ -47,9 +47,9 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: "report-${{ matrix.shardIndex }}.txt"
-          path: reports/
-          retention-days: 1
+          name: report-${{ matrix.shardIndex }}.txt
+          path: reports
+          #retention-days: 1
 
   merge-reports:
     # Merge reports after run-tests, even if some shards have failed
