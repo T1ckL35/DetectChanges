@@ -125,28 +125,19 @@ jobs:
           pattern: module*
           merge-multiple: true
 
-      # Handle multiple file wildcards in the command
-      #- run: echo "module_next_versions=$(for file in module_versions/module*; do cat $file; done)" >> $GITHUB_OUTPUT
-      #- run: echo "module_next_versions=\"$(for file in module_versions/module*; do cat $file; done | tr '\n' ' ' | xargs)"\" >> $GITHUB_OUTPUT
       - id: combine_module_versions
         run: |
-          #cat module_versions/module*
-          #export "modules_next_string=$(cat module_versions/module*)"    # TODO: might not like newlines...
-          #echo "module_next_versions=$modules_next_string" >> $GITHUB_OUTPUT
-
-          # HERE
           # echo "modules_list_output=$(echo "$changed_modules" | jq  --raw-input .  | jq --slurp . | jq -c .)"  >> $GITHUB_OUTPUT
-          #export "modules_next_string=$(cat module_versions/* | tr '\n' ' ' | xargs)"   # >> $GITHUB_OUTPUT
-          #cat module_versions/* | tr '\n' ' ' | xargs   # >> $GITHUB_OUTPUT
-          #echo "$modules_next_string"
-          #echo "module_next_versions=$modules_next_string" >> $GITHUB_OUTPUT
 
-          module_versions_string="$(cat module_versions/module* | tr '\n' ' ' | xargs)"
+          # # works to create a single space separated string
+          # module_versions_string="$(cat module_versions/module* | tr '\n' ' ' | xargs)"
+          # echo "Module Versions String: $module_versions_string"
+          # echo "module_versions_string=$module_versions_string" >> "$GITHUB_OUTPUT"
+
+          # try to create json list
+          module_versions_string="$(cat module_versions/* | jq  --raw-input .  | jq --slurp . | jq -c .)"   # > tmp_file.txt
           echo "Module Versions String: $module_versions_string"
           echo "module_versions_string=$module_versions_string" >> "$GITHUB_OUTPUT"
-
-          #echo "module_next_versions=$(echo "$changed_modules" | jq  --raw-input .  | jq --slurp . | jq -c .)"  >> $GITHUB_OUTPUT 
-          #echo $myvar
 
       #- run: echo "module_next_versions=$(cat module_versions/module*)" >> $GITHUB_OUTPUT
 
