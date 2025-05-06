@@ -40,7 +40,7 @@ jobs:
       matrix:
         shardIndex: [1, 2, 3, 4]    # trying strings as it doesn't seem to work with integers...
     steps:
-      #- run: mkdir -p reports
+      - run: mkdir -p reports
       - name: Create a File
         run: echo "${{ matrix.shardIndex }}" > reports/report-${{ matrix.shardIndex }}.txt
       # Needs to checkout the codebase for the artifact upload to work here. Strange
