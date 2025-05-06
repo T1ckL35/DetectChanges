@@ -136,7 +136,7 @@ jobs:
           cat module_versions/* | tr '\n' ' ' | xargs   # >> $GITHUB_OUTPUT
           export "modules_next_string=$(cat module_versions/* | tr '\n' ' ' | xargs)"   # >> $GITHUB_OUTPUT
           echo "$modules_next_string"
-          echo "module_next_versions" >> $GITHUB_OUTPUT
+          echo "module_next_versions=$modules_next_string" >> $GITHUB_OUTPUT
 
           #echo "module_next_versions=$(echo "$changed_modules" | jq  --raw-input .  | jq --slurp . | jq -c .)"  >> $GITHUB_OUTPUT 
           #echo $myvar
