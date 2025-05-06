@@ -48,7 +48,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: report-${{ matrix.shardIndex }}.txt
-          #path: reports2
+          path: /tmp/test/reports2
           #retention-days: 1
 
   merge-reports:
@@ -67,14 +67,14 @@ jobs:
       - name: Download blob reports from GitHub Actions Artifacts
         uses: actions/download-artifact@v4
         with:
-          #path: reports2
+          path: /tmp/test/reports2
           pattern: report-*
           merge-multiple: true
       - run: ls -R *
       - name: Display structure of downloaded files
         run: ls -R *
-      - run: ls report-*
-      - run: cat report-*
+      - run: ls /tmp/test/reports2/report-*
+      - run: cat /tmp/test/reports2/report-*
 
           
       # # https://github.com/actions/runner/pull/2477
