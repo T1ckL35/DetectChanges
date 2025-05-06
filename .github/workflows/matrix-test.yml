@@ -74,8 +74,8 @@ jobs:
       - run: ls -R *
       - name: Display structure of downloaded files
         run: ls -R *
-      - run: ls reports/report-*
-      - run: cat reports2/report-*
+      - run: ls report-*
+      - run: cat report-*
 
           
       # # https://github.com/actions/runner/pull/2477
