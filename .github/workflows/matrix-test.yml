@@ -127,7 +127,7 @@ jobs:
       #- run: echo "module_next_versions=$(for file in module_versions/module*; do cat $file; done)" >> $GITHUB_OUTPUT
       #- run: echo "module_next_versions=\"$(for file in module_versions/module*; do cat $file; done | tr '\n' ' ' | xargs)"\" >> $GITHUB_OUTPUT
       - run: |
-          cat modle_versions/module*
+          cat module_versions/module*
           export "modules_next_string=$(cat module_versions/module*)"    # TODO: might not like newlines...
           echo "module_next_versions=$modules_next_string" >> $GITHUB_OUTPUT
           #echo "module_next_versions=$(echo "$changed_modules" | jq  --raw-input .  | jq --slurp . | jq -c .)"  >> $GITHUB_OUTPUT 
