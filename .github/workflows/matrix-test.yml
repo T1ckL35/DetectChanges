@@ -47,8 +47,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: report-${{ matrix.shardIndex }}.txt
-          path: /tmp/test/reports2
+          name: report-${{ matrix.shardIndex }}                # artifact reference name - not the filename!
+          path: reports/report-${{ matrix.shardIndex }}.txt    # actual filename and path
           #retention-days: 1
 
   merge-reports:
@@ -58,8 +58,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       #- run: mkdir reports
-      - run: echo $PWD
-      - run: ls -la
+      #- run: echo $PWD
+      #- run: ls -la
       #- run: ls -la reports
       
       # Adding this results in the codebase being in DetectChanges/DetectChanges
@@ -67,14 +67,14 @@ jobs:
       - name: Download blob reports from GitHub Actions Artifacts
         uses: actions/download-artifact@v4
         with:
-          path: /tmp/test/reports2
-          pattern: report-*
+          path: reports
+          pattern: report-*.txt
           merge-multiple: true
       - run: ls -R *
       - name: Display structure of downloaded files
         run: ls -R *
-      - run: ls /tmp/test/reports2/report-*
-      - run: cat /tmp/test/reports2/report-*
+      - run: ls reports/report-*
+      - run: cat reports2/report-*
 
           
       # # https://github.com/actions/runner/pull/2477
