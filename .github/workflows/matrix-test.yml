@@ -63,8 +63,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: reports
-          #pattern: report-*
+          pattern: report-*
           merge-multiple: true
+      - run: ls -R *
       - name: Display structure of downloaded files
         run: ls -R reports
       - run: ls reports/report-*
