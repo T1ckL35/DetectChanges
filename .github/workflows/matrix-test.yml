@@ -41,8 +41,8 @@ jobs:
         shardIndex: [1, 2, 3, 4]
     steps:
       # Needs to checkout the codebase for the artifact upload to work here. Strange
-      - uses: actions/checkout@v4
-      #- run: mkdir -p reports2
+      #- uses: actions/checkout@v4
+      - run: mkdir -p reports2
       - name: Upload blob report to GitHub Actions Artifacts
         if: always()
         uses: actions/upload-artifact@v4
