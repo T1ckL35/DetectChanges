@@ -110,7 +110,7 @@ jobs:
   # # https://github.com/actions/runner/pull/2477
   # # parallel matrix doesn't yet support dynamic outputs
   # # hence storing individual output in text files and re-joining them later
-  merge-module_versions:
+  merge_module_versions:
     #if: always()
     needs: [get-changed-next-module-versions]
     runs-on: ubuntu-latest
@@ -122,10 +122,15 @@ jobs:
           path: module_versions/
           pattern: module*
           merge-multiple: true
-      - run: echo "module_next_versions=$(cat module_versions/module*)" >> $GITHUB_OUTPUT
+
+      # Handle multiple file wildcards in the command
+      - run: echo "module_next_versions=$(for file in module_versions/module*; do cat $file; done)" >> $GITHUB_OUTPUT
+
+
+      #- run: echo "module_next_versions=$(cat module_versions/module*)" >> $GITHUB_OUTPUT
 
       - id: check_module_versions_output
-        run: echo ${{ steps.merge-module_versions.outputs.module_next_versions }}
+        run: echo ${{ steps.merge_module_versions.outputs.module_next_versions }}
       
       # - id: setup_python
       #   name: Set up Python to use
