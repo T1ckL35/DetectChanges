@@ -34,7 +34,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: report-${{ matrix.shardIndex }}
-          path: reports
+          path: reports/
           retention-days: 1
 
   merge-reports:
@@ -46,7 +46,7 @@ jobs:
       - name: Download blob reports from GitHub Actions Artifacts
         uses: actions/download-artifact@v4
         with:
-          path: reports
+          path: reports/
           pattern: report-*
           merge-multiple: true
       # # https://github.com/actions/runner/pull/2477
