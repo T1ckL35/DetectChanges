@@ -38,7 +38,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shardIndex: ["1", "2", "3", "4"]    # trying strings as it doesn't seem to work with integers...
+        shardIndex: [1, 2, 3, 4]    # trying strings as it doesn't seem to work with integers...
     steps:
       - name: Create a File
         run: echo "${{ matrix.shardIndex }}" > report-${{ matrix.shardIndex }}.txt
@@ -68,7 +68,7 @@ jobs:
       - name: Download blob reports from GitHub Actions Artifacts
         uses: actions/download-artifact@v4
         with:
-          path: report-
+          #path: report-
           pattern: report-*
           merge-multiple: true
       - run: ls -R *
