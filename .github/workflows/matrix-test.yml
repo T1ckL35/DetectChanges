@@ -134,10 +134,29 @@ jobs:
           # echo "Module Versions String: $module_versions_string"
           # echo "module_versions_string=$module_versions_string" >> "$GITHUB_OUTPUT"
 
-          # try to create json list
-          module_versions_string="$(cat module_versions/* | jq  --raw-input .  | jq --slurp . | jq -c .)"   # > tmp_file.txt
+          # better way to create json list
+          module_versions_string="$(cat module_versions/* | jq  --raw-input .  | jq --slurp . | jq -c .)"
           echo "Module Versions String: $module_versions_string"
           echo "module_versions_string=$module_versions_string" >> "$GITHUB_OUTPUT"
+
+
+          # JSON tests:
+          # Build a json object frmo data
+          # echo "{\"module_name\": \"$myname1\", \"version\": \"$myval1\"}" | jq
+
+          # Merge two json objects into a json list containing them
+          #     jq -s '.' file1.json file2.json > file_combined.json
+
+
+          # # BASH SCRIPT VARIABLES to JSON
+          # MODULE_NAME=module1
+          # MODULE_NEXT_VERSION=0.0.3
+          # JSON_STRING=$( jq -n \
+          #                   --arg bn "$MODULE_NAME" \
+          #                   --arg on "$MODULE_NEXT_VERSION" \
+          #                   '{module_name: $bn, module_next_version: $on}' )
+          #
+          ## GIVES: { "module_name": "module1", "module_next_version": "0.0.3" }
 
       #- run: echo "module_next_versions=$(cat module_versions/module*)" >> $GITHUB_OUTPUT
 
