@@ -33,7 +33,8 @@ jobs:
     #outputs:
     #  matrix: ${{ steps.run_script.outputs.MODULES_MATRIX }}    # Will be used in another job to run module tests with
     outputs:
-      modules_json_list: ${{ steps.build_changed_files.outputs.modules_list_output }}
+      modules_json_list: ${{ steps.build_changed_files.outputs.modules_list_output }}    # json list of modules to use as a matrix input to determine the next available release/tag version
+      all_changed_files: ${{ steps.build_changed_files.outputs.changed_files }}          # diff of all current files that have changed. ALso used to build a configuration on if a module has tests to run
     #env:
     #  NBS_MODULE_MATRIX_NAME: "MODULES_MATRIX"                # Defines the variable name in GITHUB_OUTPUT that the python modules script outputs the data to
     steps:
@@ -114,11 +115,39 @@ jobs:
     needs: [get-changed-next-module-versions]
     runs-on: ubuntu-latest
     steps:
-      - name: Download blob module_versions from GitHub Actions Artifacts
+      - id: retrieve_changed_module_versions
+        name: Download blob module_versions from GitHub Actions Artifacts which stored the next changed module versions to use
         uses: actions/download-artifact@v4
         with:
           path: module_versions/
           pattern: module*
           merge-multiple: true
-      - run: cat module_versions/module*
+      - run: echo "module_next_versions=$(cat module_versions/module*)" >> $GITHUB_OUTPUT
+
+      - id: check_module_versions_output
+        run: echo ${{ steps.merge-module_versions.outputs.module_next_versions }}
+      
+      # - id: setup_python
+      #   name: Set up Python to use
+      #   uses: actions/setup-python@v5
+      #   with:
+      #     python-version: 3.12
+
+      # - id: run_script
+      #   name: Run script
+      #   env:
+      #       SEMVER: ${{ steps.version_step_module1.outputs.MajorMinorPatch }}    # example of pulling in a previous step's variable as an environment variable in this step. Not currently used.
+      #   run: |
+      #       # causes failure if python script fails
+      #       set -e
+
+      #       # Note, -o defines the name of a variable that is added to GITHUB_OUTPUT with the python script output
+      #       python3 .github/scripts/test.py -f "${{ steps.build_changed_files.outputs.changed_files }}" -o "${{ env.NBS_MODULE_MATRIX_NAME }}"
+
+      #       # check the python script exited ok (a python exception caught will trigger a sys.exit(1) and fail the step/workflow)
+      #       if [[ $? = 0 ]]; then
+      #           echo "success"
+      #       else
+      #           echo "failure: $?"
+      #       fi
 
