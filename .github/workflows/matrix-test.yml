@@ -22,23 +22,7 @@ on:
       #   required: true
 
 jobs:
-  # test_file:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   # works here without codebase checkout?
-  #   - run: mkdir -p reports/test
-  #   - run: echo hello > reports/test/world.txt
-  #   - uses: actions/upload-artifact@v4
-  #     with:
-  #       name: my-artifact
-  #       path: reports/test/world.txt
-
-  # install_gitversion:
-  #   runs-on: ubuntu-latest
-  #   steps:
-
-
-  run-tests:
+  get-changed-next-module-versions:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -70,8 +54,6 @@ jobs:
       - run: mkdir -p module_versions
       - name: Create a File
         run: echo "${{ matrix.module_name }}-${{ steps.version_step_module.outputs.MajorMinorPatch }}" > module_versions/${{ matrix.module_name }}.txt
-      # Needs to checkout the codebase for the artifact upload to work here. Strange
-      #- uses: actions/checkout@v4
       - name: Upload blob report to GitHub Actions Artifacts
         #if: always()
         uses: actions/upload-artifact@v4
@@ -81,36 +63,19 @@ jobs:
           retention-days: 1    # minimum retention
           overwrite: true      # deletes and creates new same named file if found
 
+  # # https://github.com/actions/runner/pull/2477
+  # # parallel matrix doesn't yet support dynamic outputs
+  # # hence storing individual output in text files and re-joining them later
   merge-module_versions:
-    # Merge module_versions after run-tests, even if some shards have failed
     #if: always()
-    needs: [run-tests]
+    needs: [get-changed-next-module-versions]
     runs-on: ubuntu-latest
     steps:
-      #- run: mkdir module_versions
-      #- run: echo $PWD
-      #- run: ls -la
-      #- run: ls -la module_versions
-      
-      # Adding this results in the codebase being in DetectChanges/DetectChanges
-      #- uses: actions/checkout@v4
       - name: Download blob module_versions from GitHub Actions Artifacts
         uses: actions/download-artifact@v4
         with:
           path: module_versions/
           pattern: module*
           merge-multiple: true
-      - run: ls -R *
-      - name: Display structure of downloaded files
-        run: ls -R *
-      - run: ls module_versions/module*
       - run: cat module_versions/module*
 
-          
-      # # https://github.com/actions/runner/pull/2477
-      # # parallel matrix doesn't yet support dynamic outputs
-      # # hence storing individual output in text files and re-joining them later
-      # - uses: actions/upload-artifact@v4
-      #   with:
-      #     name: analysis-${{ matrix.samples }}.txt
-      #     path: .github/scripts/analysis-${{ matrix.samples }}.txt
