@@ -133,10 +133,14 @@ jobs:
 
           # HERE
           # echo "modules_list_output=$(echo "$changed_modules" | jq  --raw-input .  | jq --slurp . | jq -c .)"  >> $GITHUB_OUTPUT
-          cat module_versions/* | tr '\n' ' ' | xargs   # >> $GITHUB_OUTPUT
-          export "modules_next_string=$(cat module_versions/* | tr '\n' ' ' | xargs)"   # >> $GITHUB_OUTPUT
-          echo "$modules_next_string"
-          echo "module_next_versions=$modules_next_string" >> $GITHUB_OUTPUT
+          #export "modules_next_string=$(cat module_versions/* | tr '\n' ' ' | xargs)"   # >> $GITHUB_OUTPUT
+          #cat module_versions/* | tr '\n' ' ' | xargs   # >> $GITHUB_OUTPUT
+          #echo "$modules_next_string"
+          #echo "module_next_versions=$modules_next_string" >> $GITHUB_OUTPUT
+
+          module_versions_string="$(cat module_versions/module* | tr '\n' ' ' | xargs)"
+          echo "Module Versions String: $module_versions_string"
+          echo "module_versions_string=$module_versions_string" >> "$GITHUB_OUTPUT"
 
           #echo "module_next_versions=$(echo "$changed_modules" | jq  --raw-input .  | jq --slurp . | jq -c .)"  >> $GITHUB_OUTPUT 
           #echo $myvar
@@ -144,7 +148,7 @@ jobs:
       #- run: echo "module_next_versions=$(cat module_versions/module*)" >> $GITHUB_OUTPUT
 
       - id: check_module_versions_output
-        run: echo ${{ steps.merge_module_versions.outputs.module_next_versions }}
+        run: echo ${{ steps.merge_module_versions.outputs.module_versions_string }}
       
       # - id: setup_python
       #   name: Set up Python to use
