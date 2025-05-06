@@ -22,6 +22,16 @@ on:
       #   required: true
 
 jobs:
+  test_file:
+    runs-on: ubuntu-latest
+    steps:
+    - run: mkdir -p reports/test
+    - run: echo hello > reports/test/world.txt
+    - uses: actions/upload-artifact@v4
+      with:
+        name: my-artifact
+        path: reports/test/world.txt
+
   run-tests:
     runs-on: ubuntu-latest
     strategy:
