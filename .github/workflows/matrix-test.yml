@@ -33,9 +33,9 @@ jobs:
   #       name: my-artifact
   #       path: reports/test/world.txt
 
-  install_gitversion:
-    runs-on: ubuntu-latest
-    steps:
+  # install_gitversion:
+  #   runs-on: ubuntu-latest
+  #   steps:
 
 
   run-tests:
