@@ -40,7 +40,7 @@ jobs:
       matrix:
         shardIndex: [1, 2, 3, 4]
     steps:
-      # Needs to checkout the codebase for the artifact upload to work here?
+      # Needs to checkout the codebase for the artifact upload to work here. Strange
       - uses: actions/checkout@v4
       #- run: mkdir -p reports
       - name: Upload blob report to GitHub Actions Artifacts
@@ -57,6 +57,8 @@ jobs:
     needs: [run-tests]
     runs-on: ubuntu-latest
     steps:
+      # Needs to checkout the codebase for the artifact downoad to work here. Strange
+      - uses: actions/checkout@v4
       - name: Download blob reports from GitHub Actions Artifacts
         uses: actions/download-artifact@v4
         with:
