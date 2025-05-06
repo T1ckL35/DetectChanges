@@ -59,6 +59,8 @@ jobs:
     steps:
       - run: mkdir reports
       - run: echo $PWD
+      - run: ls -la
+      - run: ls -la reports
       
       # Adding this results in the codebase being in DetectChanges/DetectChanges
       #- uses: actions/checkout@v4
