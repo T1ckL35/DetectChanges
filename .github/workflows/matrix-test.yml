@@ -38,46 +38,46 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shardIndex: [1, 2, 3, 4]    # trying strings as it doesn't seem to work with integers...
+        module_name: ["module1", "module2"]
     steps:
-      - run: mkdir -p reports
+      - run: mkdir -p module_versions
       - name: Create a File
-        run: echo "${{ matrix.shardIndex }}" > reports/report-${{ matrix.shardIndex }}.txt
+        run: echo "${{ matrix.module_name }}-x.x.x" > module_versions/${{ matrix.module_name }}.txt
       # Needs to checkout the codebase for the artifact upload to work here. Strange
       #- uses: actions/checkout@v4
       - name: Upload blob report to GitHub Actions Artifacts
         #if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: report-${{ matrix.shardIndex }}                # artifact reference name - not the filename!
-          path: reports/report-${{ matrix.shardIndex }}.txt    # actual filename and path
+          name: ${{ matrix.module_name }}                # artifact reference name - not the filename!
+          path: module_versions/${{ matrix.module_name }}.txt    # actual filename and path
           retention-days: 1    # minimum retention
           overwrite: true      # deletes and creates new same named file if found
 
-  merge-reports:
-    # Merge reports after run-tests, even if some shards have failed
+  merge-module_versions:
+    # Merge module_versions after run-tests, even if some shards have failed
     #if: always()
     needs: [run-tests]
     runs-on: ubuntu-latest
     steps:
-      #- run: mkdir reports
+      #- run: mkdir module_versions
       #- run: echo $PWD
       #- run: ls -la
-      #- run: ls -la reports
+      #- run: ls -la module_versions
       
       # Adding this results in the codebase being in DetectChanges/DetectChanges
       #- uses: actions/checkout@v4
-      - name: Download blob reports from GitHub Actions Artifacts
+      - name: Download blob module_versions from GitHub Actions Artifacts
         uses: actions/download-artifact@v4
         with:
-          path: reports/
-          pattern: report-*
+          path: module_versions/
+          pattern: module*
           merge-multiple: true
       - run: ls -R *
       - name: Display structure of downloaded files
         run: ls -R *
-      - run: ls reports/report-*
-      - run: cat reports/report-*
+      - run: ls module_versions/module*
+      - run: cat module_versions/module*
 
           
       # # https://github.com/actions/runner/pull/2477
