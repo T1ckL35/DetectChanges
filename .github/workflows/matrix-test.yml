@@ -42,13 +42,13 @@ jobs:
     steps:
       # Needs to checkout the codebase for the artifact upload to work here. Strange
       #- uses: actions/checkout@v4
-      - run: mkdir -p reports2
+      #- run: mkdir -p reports2
       - name: Upload blob report to GitHub Actions Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: report-${{ matrix.shardIndex }}.txt
-          path: reports2
+          #path: reports2
           #retention-days: 1
 
   merge-reports:
@@ -67,14 +67,14 @@ jobs:
       - name: Download blob reports from GitHub Actions Artifacts
         uses: actions/download-artifact@v4
         with:
-          path: reports2
+          #path: reports2
           pattern: report-*
           merge-multiple: true
       - run: ls -R *
       - name: Display structure of downloaded files
-        run: ls -R reports2
-      - run: ls reports2/report-*
-      - run: cat reports2/report-*
+        run: ls -R *
+      - run: ls report-*
+      - run: cat report-*
 
           
       # # https://github.com/actions/runner/pull/2477
