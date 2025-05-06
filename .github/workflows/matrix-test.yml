@@ -1,4 +1,6 @@
+name: matrix tests
 on:
+  push:
   workflow_dispatch:
     inputs:
       logLevel:
