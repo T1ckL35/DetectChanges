@@ -1,37 +1,48 @@
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+        - info
+        - warning
+        - debug
 
-  jobs:
-    run-tests:
-      runs-on: ubuntu-latest
-      strategy:
-        fail-fast: false
-        matrix:
-          shardIndex: [1, 2, 3, 4]
-      steps:
-        - name: Upload blob report to GitHub Actions Artifacts
-          #if: always()
-          uses: actions/upload-artifact@v4
-          with:
-            name: report-${{ matrix.shardIndex }}
-            path: reports
-            retention-days: 1
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shardIndex: [1, 2, 3, 4]
+    steps:
+      - name: Upload blob report to GitHub Actions Artifacts
+        #if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-${{ matrix.shardIndex }}
+          path: reports
+          retention-days: 1
 
-    merge-reports:
-      # Merge reports after run-tests, even if some shards have failed
-      #if: always()
-      needs: [run-tests]
-      runs-on: ubuntu-latest
-      steps:
-        - name: Download blob reports from GitHub Actions Artifacts
-          uses: actions/download-artifact@v4
-          with:
-            path: reports
-            pattern: report-*
-            merge-multiple: true
-        # # https://github.com/actions/runner/pull/2477
-        # # parallel matrix doesn't yet support dynamic outputs
-        # # hence storing individual output in text files and re-joining them later
-        # - uses: actions/upload-artifact@v4
-        #   with:
-        #     name: analysis-${{ matrix.samples }}.txt
-        #     path: .github/scripts/analysis-${{ matrix.samples }}.txt
+  merge-reports:
+    # Merge reports after run-tests, even if some shards have failed
+    #if: always()
+    needs: [run-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download blob reports from GitHub Actions Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: reports
+          pattern: report-*
+          merge-multiple: true
+      # # https://github.com/actions/runner/pull/2477
+      # # parallel matrix doesn't yet support dynamic outputs
+      # # hence storing individual output in text files and re-joining them later
+      # - uses: actions/upload-artifact@v4
+      #   with:
+      #     name: analysis-${{ matrix.samples }}.txt
+      #     path: .github/scripts/analysis-${{ matrix.samples }}.txt
