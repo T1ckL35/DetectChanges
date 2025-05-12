@@ -69,6 +69,79 @@ class PackageModule:
                 detected_tests.append(test_name)
         return detected_tests
     
+def get_config(self):
+    """
+    Outputs the full modules configuration
+    Expected to be a json list of objects
+    TODO: Thinking it should be in the format:
+    [
+        {
+            "module": {
+                "name": "module1",
+                "version_next": "0.0.3"    # TODO: Consider passing in and bumping Major and Minor version from the PR commmit mesage
+                "tests": [
+                    "unit",
+                    "compliance"
+                ] 
+            }
+        }
+    ]
+    """
+    pass
+
+def set_modules_list(self, modules_list=[]):
+    """
+    Adds/updates one or many module skeletons to the dictionary. Expected to be initially used when detecting which modules have code updates applied
+    For example ["module1","module2"]
+    Only adds skeleton dictionary item(s) in the format {"module": { "name": "modulename"}}
+    """
+    return
+
+def set_module_version_next(self, module, version_next):
+    """
+    Adds/updates the next calculated module version
+    This could be from the GitVersion check or from a PR message bumping to a new Major/Minor version
+    For example: "module1", "0.0.3" 
+    """
+    return
+
+def set_module_tests_list(self, module, tests_list=[]):
+    """
+    Adds/updates a list of tests based on checking the module codebase for tests within a tests folder
+    For example: ["unit, "compliance"]
+    """
+    return
+
+def set_module(self, module_config):
+    """
+    Adds/Updates the specified module configuration
+    For example: see the example structure of a module in the get_config() function
+    """
+    return
+
+def get_modules(self, output="json"):
+    """
+    Gets a list of module names in the specified format. Expected to be used for Github matrix jobs
+    For example: ["module1", "module2"]
+    """
+    return 
+
+def get_module(self, module):
+    """
+    Gets the configuration for the specified module (if it exists)
+    For example: see the example structure of a module in the get_config() function
+    """
+    return
+
+def get_module_property(self, module, property_name):
+    """
+    Gets the specified modules property
+    For example:
+        module1, version_next returns: "0.0.3"
+        module1, tests returns: ["unit", "compliance"]
+    """
+    return
+
 def output_json(self, modules_config, output_var="PYTHON_OUTPUT"):
     if "GITHUB_OUTPUT" in os.environ:
         # Write to GITHUB_OUTPUT as a variable named from the -o argument passed into this script
@@ -82,13 +155,13 @@ def output_json(self, modules_config, output_var="PYTHON_OUTPUT"):
         return modules_config
     return
 
-def update_module_parameter(self, modules_config_json, module_name, module_param_name, module_param_value, output_var):
-    """
-    Update the json object with any detected next module versions
-    """
-    modules_config = json.loads(modules_config_json)
-    modules_config[module_name][module_param_name] = module_param_value
-    return self.output_json(modules_config, output_var)
+# def update_module_parameter(self, modules_config_json, module_name, module_param_name, module_param_value, output_var):
+#     """
+#     Update the json object with any detected next module versions
+#     """
+#     modules_config = json.loads(modules_config_json)
+#     modules_config[module_name][module_param_name] = module_param_value
+#     return self.output_json(modules_config, output_var)
 
 
 

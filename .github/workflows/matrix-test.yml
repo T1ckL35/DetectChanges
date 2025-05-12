@@ -35,7 +35,7 @@ jobs:
     outputs:
       modules_json_list: ${{ steps.build_changed_files.outputs.modules_list_output }}    # json list of modules to use as a matrix input to determine the next available release/tag version
       all_changed_files: ${{ steps.build_changed_files.outputs.changed_files }}          # diff of all current files that have changed. ALso used to build a configuration on if a module has tests to run
-    #env:
+      #env:
     #  NBS_MODULE_MATRIX_NAME: "MODULES_MATRIX"                # Defines the variable name in GITHUB_OUTPUT that the python modules script outputs the data to
     steps:
       - id: checkout-codebase
@@ -57,9 +57,74 @@ jobs:
                 export changed_modules=$( git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- modules | grep -E 'modules/.*/'  | cut -d/ -f2 | uniq)
             fi
             echo "$changed_modules"
-            echo "modules_list_output=$(echo "$changed_modules" | jq  --raw-input .  | jq --slurp . | jq -c .)"  >> $GITHUB_OUTPUT       # testing friday pm
-            #modules_list_changes=$(echo "$changed_modules" | jq  --raw-input .  | jq --slurp .)
-            #echo "modules_list_output=$modules_list_changes" >> $GITHUB_OUTPUT
+            echo "modules_list_output=$(echo "$changed_modules" | jq  --raw-input .  | jq --slurp . | jq -c .)"  >> $GITHUB_OUTPUT
+
+            # extra work. Here we create a json list of objects for each module
+            # then we pull out the module names as a list to run the matrix to determine the next module versions
+            #cat json/combined.json | jq -r -c '[.[].module] | unique'
+
+            # New code - create a json object of each module and their current tag version. Also include any types of tests that need running
+            # Should give something like:
+            # [
+            #   {
+            #     "name": "module1",
+            #     "tests": ["unit", "integration"],
+            #     "tags": {
+            #       "current": "0.0.2",
+            #       "next": ""
+            #     },
+            #   },
+            #   {
+            #     "name": "module2",
+            #     "tests": ["unit"],
+            #     "tags": {
+            #       "current": "0.0.1",    # todo: handle no current tags as 0.0.1
+            #       "next": ""
+            #     },
+            #   },
+
+  # run_tests:
+  #   strategy:
+  #     matrix:
+  #       #module: [module1, module2]
+  #       include:
+  #         - module: module1
+  #           unit: true
+  #         - module: module1
+  #           bdd: true
+  #         #- module: module2
+  #         #  unit: true
+  #         #  npm: 8
+  #   runs-on: ${{ matrix.os }}  modules_json_list
+  #   steps:
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: ${{ matrix.node }}
+  #     - if: ${{ matrix.npm }}
+  #       run: npm install -g npm@${{ matrix.npm }}
+  #     - run: npm --version
+
+  includes_only:
+    needs: [get-changed-next-module-versions]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - site: "module1"
+            test: "unit"
+          - site: "module1"
+            test: "bdd"
+    steps:
+      - id: run_test
+        name: Run the specified test
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 
+      - run: echo ${{matrix.include.site}}
+      # - name: Run tests
+      #   run: |
+      #     echo "Running tests for ${{ matrix.site }} in ${{ matrix.test }}"
+      #     # Add your test command here
 
 
   get-changed-next-module-versions:
@@ -97,8 +162,10 @@ jobs:
           echo "Module 1 Next version is ${{ steps.version_step_module.outputs.MajorMinorPatch }}"
       - run: mkdir -p module_versions
       - name: Create a File
+        # works but testing outputting a json object to the file to then later be merged together again
+        # run: echo "${{ matrix.module_name }}-${{ steps.version_step_module.outputs.MajorMinorPatch }}" > module_versions/${{ matrix.module_name }}.txt
         run: echo "${{ matrix.module_name }}-${{ steps.version_step_module.outputs.MajorMinorPatch }}" > module_versions/${{ matrix.module_name }}.txt
-      - name: Upload blob report to GitHub Actions Artifacts
+        - name: Upload blob report to GitHub Actions Artifacts
         #if: always()
         uses: actions/upload-artifact@v4
         with:
