@@ -165,7 +165,7 @@ jobs:
         # works but testing outputting a json object to the file to then later be merged together again
         # run: echo "${{ matrix.module_name }}-${{ steps.version_step_module.outputs.MajorMinorPatch }}" > module_versions/${{ matrix.module_name }}.txt
         run: echo "${{ matrix.module_name }}-${{ steps.version_step_module.outputs.MajorMinorPatch }}" > module_versions/${{ matrix.module_name }}.txt
-        - name: Upload blob report to GitHub Actions Artifacts
+      - name: Upload blob report to GitHub Actions Artifacts
         #if: always()
         uses: actions/upload-artifact@v4
         with:
