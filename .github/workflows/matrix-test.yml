@@ -121,6 +121,8 @@ jobs:
         with:
           fetch-depth: 
       - run: echo ${{matrix.include.site}}
+      - run: echo ${{matrix}}
+      - run: echo ${{matrix.include}}
       # - name: Run tests
       #   run: |
       #     echo "Running tests for ${{ matrix.site }} in ${{ matrix.test }}"
