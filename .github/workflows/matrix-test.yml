@@ -142,8 +142,7 @@ jobs:
       - name: Run a python script inline to convert a bash space deparated string into a json list
         shell: python
         run: |
-          from .github.scripts.matrix_helper import MatrixHelper
-          # from matrix_helper import MatrixHelper
+          from scripts.matrix_helper import MatrixHelper
 
           # Create an instance of the MatrixHelper class
           matrix_helper = MatrixHelper()
@@ -317,7 +316,7 @@ jobs:
       #       set -e
 
       #       # Note, -o defines the name of a variable that is added to GITHUB_OUTPUT with the python script output
-      #       python3 .github/scripts/test.py -f "${{ steps.build_changed_files.outputs.changed_files }}" -o "${{ env.NBS_MODULE_MATRIX_NAME }}"
+      #       python3 scripts/test.py -f "${{ steps.build_changed_files.outputs.changed_files }}" -o "${{ env.NBS_MODULE_MATRIX_NAME }}"
 
       #       # check the python script exited ok (a python exception caught will trigger a sys.exit(1) and fail the step/workflow)
       #       if [[ $? = 0 ]]; then
