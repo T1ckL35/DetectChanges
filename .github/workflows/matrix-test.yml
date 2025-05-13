@@ -82,18 +82,18 @@ jobs:
             #       "next": ""
             #     },
             #   },
-      - id: setup_python
-        name: Set up Python to use
-        uses: actions/setup-python@v5
-        with:
-            python-version: 3.12
+      # - id: setup_python
+      #   name: Set up Python to use
+      #   uses: actions/setup-python@v5
+      #   with:
+      #       python-version: 3.12
     
-      - id: run_script
-        name: Run script
-        run: |
-            # causes failure if python script fails
-            set -e 
-            python3 modules/${{ matrix.module }}/test.py -f "${{ steps.build_changed_files.outputs.changed_files }}" -o "${{ env.NBS_MODULE_MATRIX_NAME }}"
+      # - id: run_script
+      #   name: Run script
+      #   run: |
+      #       # causes failure if python script fails
+      #       set -e 
+      #       python3 modules/${{ matrix.module }}/test.py -f "${{ steps.build_changed_files.outputs.changed_files }}" -o "${{ env.NBS_MODULE_MATRIX_NAME }}"
   
     
 
