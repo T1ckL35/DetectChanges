@@ -142,19 +142,19 @@ jobs:
       - name: Run a python script inline to convert a bash space deparated string into a json list
         shell: python
         run: |
-          from scripts.matrix_helper import MatrixHelper
+          from scripts import matrix_helper.MatrixHelper
 
           # Create an instance of the MatrixHelper class
-          matrix_helper = MatrixHelper()
+          app = MatrixHelper()
           
           # Configure logging to output to both file and console
-          matrix_helper.output_logging()
+          app.output_logging()
           
           # Generate a list of includes for module1
           item = "module1"
           list = ["unit", "bdd"]
           # Generate includes using the helper method. Note, using the extra parameter defaults of "module" and "test"
-          includes = matrix_helper.generate_includes_from_list(item, list)
+          includes = app.generate_includes_from_list(item, list)
           #print(includes)
 
           # Generate a list of includes for module2
@@ -162,10 +162,10 @@ jobs:
           list = ["unit"]
           # Merge all the includes into a single list
           includes.extend(
-              matrix_helper.generate_includes_from_list(item, list)
+              app.generate_includes_from_list(item, list)
           )
           # Wrap the includes in a JSON object for Github Actions
-          json_output = matrix_helper.wrap_includes_in_json(includes)
+          json_output = app.wrap_includes_in_json(includes)
           # Print the generated includes for demonstration purposes
           print(json_output)
 
