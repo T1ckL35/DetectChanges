@@ -1,2 +1,6 @@
 mylogfile
 test.py
+gha_matrix_logs
+testcat*
+reports/*
+json/*
