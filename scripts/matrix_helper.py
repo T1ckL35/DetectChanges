@@ -4,7 +4,7 @@ Name/Description etc.. goes here
 
 #import argparse
 import logging
-#import os
+import os
 import sys
 import json
 
@@ -43,22 +43,26 @@ class MatrixHelper:
             includes.append(include)
         return includes
     
-    def convert_to_json(self, data):
+    def wrap_includes(self, includes):
         """
-        Outputs the given data as JSON.
+        Wraps the includes in a dictionary with the key "include".
         """
-        json_output = json.dumps(data)
-        logging.info(f"JSON Output: {json_output}")
-        #print(json_output)
-
-    def wrap_includes_in_json(self, includes):
-        """
-        Wraps the includes in a JSON object ready for use in a Github Actions Matrix
-        """
-        json_output = {
+        return {
             "include": includes
         }
-        return json.dumps(json_output)
+    
+    ##### HERE introduce outputting the json to GITHUB_OUTPUT asbed on the variable name specified!
+    def output_json(self, final_includes, output_var="PYTHON_OUTPUT"):
+        if "GITHUB_OUTPUT" in os.environ:
+            # Write to GITHUB_OUTPUT as a variable named from the -o argument passed into this script
+            with open(os.environ["GITHUB_OUTPUT"], "a") as fh:
+                # example output: 'PYTHON_OUTPUT={"include":[{"module":"module1","test":"unit"},{"module":"module1","test":"bdd"},{"module":"module2","test":"unit"}]}'
+                # note, if output_var is not supplied then the the default GITHUB_OUTPUT variable will be named PYTHON_OUTPUT
+                #       if using multiple python scripts then this variable needs to change otherwise running this again will overwrite the GITHUB_OUTPUT variable!
+                print(f"{output_var}={str(json.dumps(final_includes))}", file=fh)
+        else:
+            # called by a python script/module so returning the dictionary object
+            return final_includes
     
 if __name__ == "__main__":
 
@@ -84,7 +88,5 @@ if __name__ == "__main__":
     includes.extend(
         matrix_helper.generate_includes_from_list(item, list)
     )
-    # Wrap the includes in a JSON object for Github Actions
-    json_output = matrix_helper.wrap_includes_in_json(includes)
-    # Print the generated includes for demonstration purposes
-    print(json_output)
+    final_includes = matrix_helper.wrap_includes(includes)
+    matrix_helper.output_json(final_includes)

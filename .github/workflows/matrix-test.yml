@@ -168,12 +168,10 @@ jobs:
           list = ["unit"]
           # Merge all the includes into a single list
           includes.extend(
-              app.generate_includes_from_list(item, list)
+            matrix_helper.generate_includes_from_list(item, list)
           )
-          # Wrap the includes in a JSON object for Github Actions
-          json_output = app.wrap_includes_in_json(includes)
-          # Print the generated includes for demonstration purposes
-          print(json_output)
+          final_includes = matrix_helper.wrap_includes(includes, "TESTS_MATRIX_OUTPUT")
+          matrix_helper.output_json(final_includes)
 
 
   run_module_tests:
