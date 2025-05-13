@@ -89,4 +89,4 @@ if __name__ == "__main__":
         app.generate_includes_from_list(item, list)
     )
     final_includes = app.wrap_includes(includes)
-    app.output_json(final_includes)
+    app.output_json(final_includes, "TESTS_MATRIX_OUTPUT")

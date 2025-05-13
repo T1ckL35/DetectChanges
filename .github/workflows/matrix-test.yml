@@ -170,8 +170,8 @@ jobs:
           includes.extend(
             app.generate_includes_from_list(item, list)
           )
-          final_includes = app.wrap_includes(includes, "TESTS_MATRIX_OUTPUT")
-          app.output_json(final_includes)
+          final_includes = app.wrap_includes(includes)
+          app.output_json(final_includes, "TESTS_MATRIX_OUTPUT")
 
 
   run_module_tests:
