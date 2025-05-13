@@ -136,13 +136,19 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: 3.12
+      - id: sort_pythonpath
+        name: Sorts the PYTHONPATH so we can import custom python modules
+        run: |
+          echo "PYTHONPATH=$PYTHONPATH:${{ github.workspace }}" >> $GITHUB_ENV
       - name: show python path
         run: |
             python -c "import sys; import os; print('\n'.join(sys.path)); print(os.getcwd())"
       - name: Run a python script inline to convert a bash space deparated string into a json list
         shell: python
         run: |
-          from .scripts import matrix_helper
+          # codepath isn't in PYTHONPATH
+          # ${{ github.workspace }} # e.g, /home/runner/work/my-repo-name/my-repo-name
+          from scripts import matrix_helper
 
           # Create an instance of the MatrixHelper class
           app = matrix_helper.MatrixHelper()
