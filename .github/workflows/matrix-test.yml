@@ -137,7 +137,7 @@ jobs:
       - name: Run a python script inline to convert a bash space deparated string into a json list
         shell: python
         run: |
-          from matrix_helper import MatrixHelper
+          from .github.scripts.matrix_helper import MatrixHelper
 
           # Create an instance of the MatrixHelper class
           matrix_helper = MatrixHelper()
