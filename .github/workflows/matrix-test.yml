@@ -133,7 +133,7 @@ jobs:
           python-version: 3.12
       - name: show python path
         run: |
-            python -c "import sys; print('\n'.join(sys.path))"
+            python -c "import sys; import os; print('\n'.join(sys.path)); print(os.getcwd())"
       - name: Run a python script inline to convert a bash space deparated string into a json list
         shell: python
         run: |
