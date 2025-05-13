@@ -174,7 +174,7 @@ jobs:
           final_includes = app.wrap_includes(includes)
           app.output_json(final_includes, "TESTS_MATRIX_OUTPUT")
       - run: |
-        echo "${{ steps.build_tests_matrix_includes.outputs.TESTS_MATRIX_OUTPUT }}"
+          echo "${{ steps.build_tests_matrix_includes.outputs.TESTS_MATRIX_OUTPUT }}"
 
 
   run_module_tests:
