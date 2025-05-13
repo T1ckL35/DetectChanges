@@ -69,16 +69,16 @@ if __name__ == "__main__":
     print("Running the MatrixHelper script directly...")
 
     # Create an instance of the MatrixHelper class
-    matrix_helper = MatrixHelper()
+    app = MatrixHelper()
     
     # Configure logging to output to both file and console
-    matrix_helper.output_logging()
+    app.output_logging()
     
     # Generate a list of includes for module1
     item = "module1"
     list = ["unit", "bdd"]
     # Generate includes using the helper method. Note, using the extra parameter defaults of "module" and "test"
-    includes = matrix_helper.generate_includes_from_list(item, list)
+    includes = app.generate_includes_from_list(item, list)
     #print(includes)
 
     # Generate a list of includes for module2
@@ -86,7 +86,7 @@ if __name__ == "__main__":
     list = ["unit"]
     # Merge all the includes into a single list
     includes.extend(
-        matrix_helper.generate_includes_from_list(item, list)
+        app.generate_includes_from_list(item, list)
     )
-    final_includes = matrix_helper.wrap_includes(includes)
-    matrix_helper.output_json(final_includes)
+    final_includes = app.wrap_includes(includes)
+    app.output_json(final_includes)

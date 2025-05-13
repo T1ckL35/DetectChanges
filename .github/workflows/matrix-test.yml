@@ -168,10 +168,10 @@ jobs:
           list = ["unit"]
           # Merge all the includes into a single list
           includes.extend(
-            matrix_helper.generate_includes_from_list(item, list)
+            app.generate_includes_from_list(item, list)
           )
-          final_includes = matrix_helper.wrap_includes(includes, "TESTS_MATRIX_OUTPUT")
-          matrix_helper.output_json(final_includes)
+          final_includes = app.wrap_includes(includes, "TESTS_MATRIX_OUTPUT")
+          app.output_json(final_includes)
 
 
   run_module_tests:
