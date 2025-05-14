@@ -63,6 +63,7 @@ class PackageModule:
         :return:
         """
         detected_tests = []
+        # cycle through the known tests list and check if they exist in the module tests directory
         for test_name in self.tests_list:
             test_path = os.path.join(module_tests_path, test_name)
             if os.path.isdir(test_path):

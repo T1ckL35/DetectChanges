@@ -1,0 +1,89 @@
+name: matrix tests
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+        - info
+        - warning
+        - debug
+
+jobs:
+
+  build_configuration:
+    name: Build Configuration
+    runs-on: ubuntu-latest
+    # To add in at some point
+    # if: github.event.pull_request.merged == true
+    # Map a step output to a job output. A shortcut way to defining a variable instead of the full path
+    #     e.g, 
+    #outputs:
+    #  matrix: ${{ steps.run_script.outputs.MODULES_MATRIX }}    # Will be used in another job to run module tests with
+    outputs:
+        all_changed_files: ${{ steps.build_changed_files.outputs.changed_files }}        # diff of all current files that have changed. ALso used to build a configuration on if a module has tests to run
+        tests_matrix: ${{ steps.build_tests_matrix_includes.outputs.MODULES_CONFIG }}    # matrix of tests to run against changed modules
+    #env:
+    #  NBS_MODULE_MATRIX_NAME: "MODULES_MATRIX"                # Defines the variable name in GITHUB_OUTPUT that the python modules script outputs the data to
+    steps:
+      - id: checkout-codebase
+        name: Checks out the codebase as needed. If this is a PR then it uses a fetch-depth of 2 to determine the changes. Otherwise the fetch-depth is 0 to get the full git history
+        uses: actions/checkout@v4
+        with:
+          # Note, if a depth of 2 is used then we will need to checkout again with a depth of zero in a later step so that GitVersion has the full repo history to be able to create a semver version with..
+          fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
+
+      - id: build_changed_files
+        name: Builds a list of changed modules and their files. Output to 'changed_files' variable
+        run: |
+          # Pushes output to $GITHUB_OUTPUT so it can be used in other jobs/steps
+          if ${{ github.event_name == 'pull_request' }}; then
+              echo "changed_files=$(git diff --name-only -r HEAD^1 HEAD | xargs)" >> $GITHUB_OUTPUT
+          else
+              echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
+          fi
+
+      - id: determine_versions
+        name: Optional at present. Only needed if we want to determine the next module version to tag. This part can work with GitVersion but may need changing as that is not in the allowed Github Actions for NBS as yet (even though it is used in the cicd github actions catalog)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: setup_python
+        name: Set up Python to use
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+      - id: configure_pythonpath
+        name: Sorts the PYTHONPATH so we can import custom python modules from the codebase
+        run: |
+          echo "PYTHONPATH=$PYTHONPATH:${{ github.workspace }}" >> $GITHUB_ENV
+      - id: show_pythonPath
+        name: show python path
+        run: |
+          python -c "import sys; import os; print('\n'.join(sys.path)); print(os.getcwd())"
+      - id: build_tests_matrix_includes
+        name: Run a python script inline to convert a bash space deparated string into a json list
+        shell: python
+        run: |
+          # codepath isn't in PYTHONPATH
+          # ${{ github.workspace }} # e.g, /home/runner/work/my-repo-name/my-repo-name
+          from scripts import matrix_helper
+
+          # Create an instance of the ModulesConfig class
+          app = ModulesConfig()
+          
+          # Build the modules config
+          app.build_modules_config(${{ steps.build_changed_files.outputs.changed_files }}, "MODULES_CONFIG")
+          
+          # Build the tests include matrix config
+          app.build_tests_include_matrix_config()
+      - id: debug_show_modules_config
+        name: Check the modules config output is correct
+        run: |
+          echo "${{ steps.build_tests_matrix_includes.outputs.MODULES_CONFIG }}"
+          ###echo "${{ build_configuration.outputs.tests_matrix }}"
+
