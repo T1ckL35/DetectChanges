@@ -71,7 +71,7 @@ jobs:
         run: |
           # codepath isn't in PYTHONPATH
           # ${{ github.workspace }} # e.g, /home/runner/work/my-repo-name/my-repo-name
-          from scripts import modules_config
+          from scripts import modules_config.ModulesConfig
 
           # Create an instance of the ModulesConfig class
           app = ModulesConfig()
