@@ -73,6 +73,9 @@ jobs:
           # ${{ github.workspace }} # e.g, /home/runner/work/my-repo-name/my-repo-name
           from scripts import modules_config
 
+          # Configure logging to output to both file and console
+          app.output_logging()
+
           # Create an instance of the ModulesConfig class
           app = modules_config.ModulesConfig()
           
