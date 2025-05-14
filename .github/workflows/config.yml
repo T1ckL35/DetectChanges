@@ -96,7 +96,7 @@ jobs:
 
   run_module_tests:
     needs: [build_configuration]
-    if: if: ${{ success() && needs.build_configuration.outputs.tests_matrix }}
+    if: ${{ success() && needs.build_configuration.outputs.tests_matrix }}
     runs-on: ubuntu-latest
     strategy:
       matrix: ${{ fromJSON(needs.build_configuration.outputs.tests_matrix) }}
