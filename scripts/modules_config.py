@@ -63,9 +63,13 @@ class ModulesConfig:
             logging.info('ModulesConfig - building new configuration...')
             
             logging.debug(os.getcwd())
-            # TEMP TODO: Remove as just for local testing
-            os.chdir("..")
-            logging.debug(os.getcwd())
+            # TODO: hack for locally testing code for now - remove when happy
+            if "GITHUB_OUTPUT" not in os.environ:
+                # TEMP TODO: Remove as just for local testing
+                os.chdir("..")
+                logging.debug('ModulesConfig - running locally and not in Github so switching the directory to test things...')
+                logging.debug(os.getcwd())
+
 
             files_list = files_string.split()
             logging.debug(f"ModulesConfig - files_list: {files_list}")
