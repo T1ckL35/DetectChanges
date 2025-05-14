@@ -93,3 +93,21 @@ jobs:
           echo "${{ steps.build_tests_matrix_includes.outputs.TESTS_MATRIX_OUTPUT }}"
           
 
+  run_module_tests:
+    needs: [build_configuration]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJSON(needs.build_configuration.outputs.tests_matrix) }}
+        # include:
+        #   - module: "module1"
+        #     test: "unit"
+        #   - module: "module1"
+        #     test: "bdd"
+    steps:
+      - id: run_test
+        name: Run the specified test
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: |
+          echo "For Module: ${{matrix.module}} Running Test: ${{matrix.test}}"  
