@@ -81,6 +81,8 @@ jobs:
           app.output_logging()
           
           # Build the modules config
+          # TODO1: test passing in a prepopulated one as an example
+          # TODO2: test
           app.build_modules_config("${{ steps.build_changed_files.outputs.changed_files }}", "MODULES_CONFIG")
           
           # Build the tests include matrix config
@@ -94,6 +96,7 @@ jobs:
 
   run_module_tests:
     needs: [build_configuration]
+    if: if: ${{ success() && needs.build_configuration.outputs.tests_matrix }}
     runs-on: ubuntu-latest
     strategy:
       matrix: ${{ fromJSON(needs.build_configuration.outputs.tests_matrix) }}
