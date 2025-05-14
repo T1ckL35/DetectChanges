@@ -77,7 +77,7 @@ jobs:
           app = ModulesConfig()
           
           # Build the modules config
-          app.build_modules_config(${{ steps.build_changed_files.outputs.changed_files }}, "MODULES_CONFIG")
+          app.build_modules_config("${{ steps.build_changed_files.outputs.changed_files }}", "MODULES_CONFIG")
           
           # Build the tests include matrix config
           app.build_tests_include_matrix_config()
