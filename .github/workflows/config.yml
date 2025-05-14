@@ -88,7 +88,7 @@ jobs:
         name: Check the modules config output is correct
         run: |
           echo "$PWD"
-          echo "ls -la"
+          ls -la
           echo "${{ steps.build_tests_matrix_includes.outputs.MODULES_CONFIG }}"
           echo "${{ steps.build_tests_matrix_includes.outputs.TESTS_MATRIX_OUTPUT }}"
           
