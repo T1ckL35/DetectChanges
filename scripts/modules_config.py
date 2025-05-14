@@ -88,7 +88,7 @@ class ModulesConfig:
                     logging.debug(f"ModulesConfig - module_info: {module_info}")
 
                     # check for tests folders. If present add a 'tests' key to the dictionary with a list of tests to run
-                    tests_path = os.path.join(path_parts[0], path_parts[1], "tests")
+                    tests_path = os.path.join(os.getcwd(), path_parts[0], path_parts[1], "tests")
                     logging.debug(f"ModulesConfig - tests_path: {tests_path}")
                     if os.path.isdir(tests_path):
                         module_info['tests'] = self.get_tests_list(os.path.join(tests_path))
