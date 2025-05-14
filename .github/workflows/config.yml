@@ -71,10 +71,10 @@ jobs:
         run: |
           # codepath isn't in PYTHONPATH
           # ${{ github.workspace }} # e.g, /home/runner/work/my-repo-name/my-repo-name
-          from scripts import modules_config.ModulesConfig
+          from scripts import modules_config
 
           # Create an instance of the ModulesConfig class
-          app = ModulesConfig()
+          app = modules_config.ModulesConfig()
           
           # Build the modules config
           app.build_modules_config("${{ steps.build_changed_files.outputs.changed_files }}", "MODULES_CONFIG")
