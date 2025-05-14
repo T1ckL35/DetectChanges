@@ -1,4 +1,4 @@
-name: matrix tests
+name: config
 on:
   push:
   workflow_dispatch:
@@ -85,5 +85,4 @@ jobs:
         name: Check the modules config output is correct
         run: |
           echo "${{ steps.build_tests_matrix_includes.outputs.MODULES_CONFIG }}"
-          ###echo "${{ build_configuration.outputs.tests_matrix }}"
 
