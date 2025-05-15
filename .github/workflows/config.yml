@@ -72,7 +72,7 @@ jobs:
           from scripts import modules_config
 
           # Create an instance of the ModulesConfig class
-          TestJsonModulesConfigOverride = '[{"module": "module3", "tests": ["bdd"]}]''
+          TestJsonModulesConfigOverride = '[{"module": "module3", "tests": ["bdd"]}]'
           app = modules_config.ModulesConfig(TestJsonModulesConfigOverride)
 
           # Configure logging to output to both file and console
