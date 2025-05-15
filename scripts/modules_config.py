@@ -163,7 +163,7 @@ class ModulesConfig:
         """
         if github_type in os.environ:
             # Write to GITHUB_OUTPUT as a variable named from the output_var variable value passed into this function
-            with open(os.getenv[github_type], "a") as fh:
+            with open(os.getenv(github_type), "a") as fh:
                 # example: matrix strategy config output: 'PYTHON_OUTPUT={"include":[{"module":"module1","test":"unit"},{"module":"module1","test":"bdd"},{"module":"module2","test":"unit"}]}'
                 # note, if output_var is not supplied then the the default GITHUB_OUTPUT variable will be named PYTHON_OUTPUT
                 #       if using multiple python scripts then this variable needs to change otherwise running this again will overwrite the GITHUB_OUTPUT variable!
