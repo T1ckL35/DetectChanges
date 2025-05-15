@@ -116,4 +116,6 @@ jobs:
       - run: |
           echo "For Module: ${{matrix.module}} Running Test: ${{matrix.test}}"  
       - run: |
-          echo "Debug test to check that the modules_config env var has been set and is available: ${{ env.MODULES_CONFIG }}"
+          echo "Debug 1 test to check that the modules_config env var has been set and is available: ${{ env.MODULES_CONFIG }}"
+          echo "Debug 2 test to check that the modules_config env var has been set and is available: ${{ $MODULES_CONFIG }}"
+          echo "Debug 3 test to check that the modules_config env var has been set and is available: ${{ vars.MODULES_CONFIG }}"
