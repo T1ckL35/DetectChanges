@@ -97,9 +97,9 @@ class ModulesConfig:
                     self.modules_config.append(module_info)
 
             #print(json.dumps(modules_tojson, indent=2))
-            # If running in Github Actions then output the modules_config to GITHUB_OUTPUT
+            # If running in Github Actions then output the modules_config to GITHUB_ENV
             # If not then just return the json data
-            return self.output_json(self.modules_config, self.modules_config_env_var)
+            return self.output_json(self.modules_config, self.modules_config_env_var, "GITHUB_ENV")
 
     def get_tests_list(self, module_tests_path):
         """
@@ -132,7 +132,7 @@ class ModulesConfig:
         if strategy_config:
             wrapped_matrix_strategy = self.wrap_matrix_strategy_type("include", strategy_config)
             # Push the output to the default GITHUB_OUTPUT variable.
-            return self.output_json(wrapped_matrix_strategy, "TESTS_MATRIX_OUTPUT", "GITHUB_ENV")
+            return self.output_json(wrapped_matrix_strategy, "TESTS_MATRIX_OUTPUT")
             # The subsequent tests matrix job needs to detect if this variable has been set in GITHUB_OUTPUT.
 
     def generate_matrix_strategy_config(self, item, list, param1="module", param2="test"):
