@@ -96,20 +96,20 @@ jobs:
         run: |
           echo "${{ steps.build_tests_matrix_includes.outputs.MODULES_CONFIG }}"
           echo "${{ steps.build_tests_matrix_includes.outputs.TESTS_MATRIX_OUTPUT }}"
-      - shell: python
-        run: |
-          import os
-          env_file = os.getenv('GITHUB_ENV')
-          with open(env_file, "a") as myfile:
-              myfile.write("myvar2=UPDATED_BY_PYTHON")
-      - name: DEBUG - Show the environment variables
-        run: |
-          env
-          echo ${{ env.myvar }}
-          echo ${{ env.myvar2 }}
-          echo "myvar=UPDATED" >> $GITHUB_ENV
-      - run: |
-          echo ${{ env.myvar }}
+      # - shell: python
+      #   run: |
+      #     import os
+      #     env_file = os.getenv('GITHUB_ENV')
+      #     with open(env_file, "a") as myfile:
+      #         myfile.write("myvar2=UPDATED_BY_PYTHON")
+      # - name: DEBUG - Show the environment variables
+      #   run: |
+      #     env
+      #     echo ${{ env.myvar }}
+      #     echo ${{ env.myvar2 }}
+      #     echo "myvar=UPDATED" >> $GITHUB_ENV
+      # - run: |
+      #     echo ${{ env.myvar }}
         
           
 
