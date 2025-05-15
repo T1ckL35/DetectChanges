@@ -13,10 +13,6 @@ on:
         - warning
         - debug
 
-env:
-  myvar: "123"
-  myvar2: ""
-
 jobs:
   build_configuration:
     name: Build Configuration
@@ -96,23 +92,7 @@ jobs:
         run: |
           echo "${{ steps.build_tests_matrix_includes.outputs.MODULES_CONFIG }}"
           echo "${{ steps.build_tests_matrix_includes.outputs.TESTS_MATRIX_OUTPUT }}"
-      - shell: python
-        run: |
-          import os
-          env_file = os.getenv('GITHUB_ENV')
-          with open(env_file, "a") as myfile:
-              # Note, if adding multiple variables with separate commands then add \n to the end of each line (apart from the last)
-              myfile.write("myvar2=UPDATED_BY_PYTHON")
-      - name: DEBUG - Show the environment variables
-        run: |
-          env
-          echo ${{ env.myvar }}
-          echo ${{ env.myvar2 }}
-          echo "myvar=UPDATED" >> $GITHUB_ENV
-      - run: |
-          echo ${{ env.myvar }}
-        
-          
+
 
   run_module_tests:
     name: "Run Module Tests: ${{matrix.module}} - ${{matrix.test}}"
@@ -145,8 +125,7 @@ jobs:
       # debug
       - run: |
           echo "Debug on modules_configuration variable: ${{ needs.build_configuration.outputs.modules_configuration }}"
-          env
-          echo ${{ env.MODULES_CONFIG }}
+
 
   # test_update_modules_config:
   #   name: Testing updating the modules_config
