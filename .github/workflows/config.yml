@@ -95,7 +95,7 @@ jobs:
           
 
   run_module_tests:
-    name: Run Module Tests using an includes matrix pattern
+    name: "Run Module Tests: ${{matrix.module}} - ${{matrix.test}}"
     needs: [build_configuration]
     if: ${{ success() && needs.build_configuration.outputs.tests_matrix }}
     runs-on: ubuntu-latest
