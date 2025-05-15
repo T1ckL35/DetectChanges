@@ -96,6 +96,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix: ${{ fromJSON(needs.build_configuration.outputs.tests_matrix) }}
+        # tests_matrix is a prebuilt json structure that maps to something similar as below in yaml
+        # This then makes this job run multiple times for each item and passes in the matrix values for each
         # include:
         #   - module: "module1"
         #     test: "unit"
