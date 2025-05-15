@@ -72,14 +72,17 @@ jobs:
           from scripts import modules_config
 
           # Create an instance of the ModulesConfig class
-          TestJsonModulesConfigOverride = '[{"module": "module3", "tests": ["bdd"]}]'
-          app = modules_config.ModulesConfig(TestJsonModulesConfigOverride)
+          app = modules_config.ModulesConfig()
 
-          # Configure logging to output to both file and console
+          ## Example of how to prepopulate modules_config for if it has already been set or needs to be overridden
+          ## test_modules_config_override = '[{"module": "module3", "tests": ["bdd"]}]'
+          ## app = modules_config.ModulesConfig(test_modules_config_override)
+
+          # Configure logging to output to both file and console. TODO: only do this if running the workflow in debug mode
           app.output_logging()
           
           # Build the modules config
-          # Automatically pushes the configuration to GITHUB_OUTPUT so it can be used in other jobs/steps
+          # Automatically pushes the modules configuration to GITHUB_OUTPUT so it can be used in other jobs/steps
           app.build_modules_config("${{ steps.build_changed_files.outputs.changed_files }}", "MODULES_CONFIG")
           
           # Build the tests include matrix config. Automatically pushes the result to GITHUB_OUTPUT
@@ -92,6 +95,7 @@ jobs:
           
 
   run_module_tests:
+    name: Run Module Tests using an includes matrix pattern
     needs: [build_configuration]
     if: ${{ success() && needs.build_configuration.outputs.tests_matrix }}
     runs-on: ubuntu-latest
@@ -111,11 +115,13 @@ jobs:
         #     test: "unit"
     steps:
       - id: run_test
-        name: Run the specified test
+        name: "Run ${{matrix.test}} tests on ${{matrix.module}}"
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      # debug
       - run: |
           echo "For Module: ${{matrix.module}} Running Test: ${{matrix.test}}"  
+      # debug
       - run: |
           echo "Debug on modules_configuration variable: ${{ needs.build_configuration.outputs.modules_configuration }}"
