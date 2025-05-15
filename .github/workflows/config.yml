@@ -29,7 +29,7 @@ jobs:
     #  matrix: ${{ steps.run_script.outputs.MODULES_MATRIX }}    # Will be used in another job to run module tests with
     outputs:
         all_changed_files: ${{ steps.build_changed_files.outputs.changed_files }}                 # diff of all current files that have changed. ALso used to build a configuration on if a module has tests to run
-        # modules_configuration: ${{ steps.build_tests_matrix_includes.outputs.MODULES_CONFIG }}    # configuration of module information for any that have had file changes made. Consists of the module name and a list of tests, if present. Future additions will be to detect the current module version and predict the next version to use if all tests pass
+        modules_configuration: ${{ steps.build_tests_matrix_includes.outputs.MODULES_CONFIG }}    # configuration of module information for any that have had file changes made. Consists of the module name and a list of tests, if present. Future additions will be to detect the current module version and predict the next version to use if all tests pass
         tests_matrix: ${{ steps.build_tests_matrix_includes.outputs.TESTS_MATRIX_OUTPUT }}        # matrix of tests to run against changed modules
     #env:
     #  NBS_MODULE_MATRIX_NAME: "MODULES_MATRIX"                # Defines the variable name in GITHUB_OUTPUT that the python modules script outputs the data to
@@ -92,7 +92,7 @@ jobs:
       - id: debug_show_modules_config
         name: Check the modules config output is correct
         run: |
-          echo "${{ env.MODULES_CONFIG }}" # check it has been set in the previous step (can't check in the same step as it won't show the update there)
+          echo "${{ steps.build_tests_matrix_includes.outputs.MODULES_CONFIG }}"
           echo "${{ steps.build_tests_matrix_includes.outputs.TESTS_MATRIX_OUTPUT }}"
           
 
@@ -116,6 +116,4 @@ jobs:
       - run: |
           echo "For Module: ${{matrix.module}} Running Test: ${{matrix.test}}"  
       - run: |
-          echo "Debug 1 test to check that the modules_config env var has been set and is available: ${{ env.MODULES_CONFIG }}"
-          echo "Debug 2 test to check that the modules_config env var has been set and is available: $MODULES_CONFIG"
-          echo "Debug 3 test to check that the modules_config env var has been set and is available: ${{ vars.MODULES_CONFIG }}"
+          echo "Debug test to check that the modules_config env var has been set and is available: ${{ needs.build_configuration.outputs.modules_configuration }}""
