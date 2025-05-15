@@ -28,11 +28,11 @@ class ModulesConfig:
             self.modules_config = json.loads(modules_config)
         else:
             # First read the environment to see if we already have a modules_config set
-            if self.modules_config_env_var in os.environ:
-                logging.debug("ModulesConfig - modules_config found in environment")
+            if self.modules_config_env_var in os.environ and os.environ[self.modules_config_env_var] != "":
+                logging.debug("ModulesConfig - populated modules_config found in environment")
                 self.modules_config = json.loads(os.environ[self.modules_config_env_var])
             else:
-                logging.debug("ModulesConfig - no modules_config found in environment. A new configuration will be built")
+                logging.debug("ModulesConfig - no populated modules_config found in environment. A new configuration will be built")
 
 
     def output_logging(self):
@@ -97,9 +97,9 @@ class ModulesConfig:
                     self.modules_config.append(module_info)
 
             #print(json.dumps(modules_tojson, indent=2))
-            # If running in Github Actions then output the modules_config to GITHUB_OUTPUT
+            # If running in Github Actions then output the modules_config to GITHUB_ENV
             # If not then just return the json data
-            return self.output_json(self.modules_config, self.modules_config_env_var)
+            return self.output_json(self.modules_config, self.modules_config_env_var, "GITHUB_ENV")
 
     def get_tests_list(self, module_tests_path):
         """
@@ -115,9 +115,10 @@ class ModulesConfig:
                 detected_tests.append(test_name)
         return detected_tests
     
-    def build_tests_include_matrix_config(self):
+    def build_tests_matrix_config(self):
         """
         Uses the existing config to build a matrix strategy json object to run changed module tests
+        By default pushes to GITHUB_OUTPUT > TESTS_MATRIX_OUTPUT as a variable to use
         """
         strategy_config = []
         for module in self.modules_config:
@@ -130,6 +131,7 @@ class ModulesConfig:
         # Wrap the strategy_config in a dictionary
         if strategy_config:
             wrapped_matrix_strategy = self.wrap_matrix_strategy_type("include", strategy_config)
+            # Push the output to the default GITHUB_OUTPUT variable. Not needed here but can be altered by passing an extra parameter with GITHUB_ENV if wanting to use env vars
             return self.output_json(wrapped_matrix_strategy, "TESTS_MATRIX_OUTPUT")
             # The subsequent tests matrix job needs to detect if this variable has been set in GITHUB_OUTPUT.
 
@@ -154,11 +156,15 @@ class ModulesConfig:
             name: matrix_strategy_config
         }
     
-    def output_json(self, final_output, output_var="PYTHON_OUTPUT"):
-        if "GITHUB_OUTPUT" in os.environ:
-            # Write to GITHUB_OUTPUT as a variable named from the -o argument passed into this script
-            with open(os.environ["GITHUB_OUTPUT"], "a") as fh:
-                # example output: 'PYTHON_OUTPUT={"include":[{"module":"module1","test":"unit"},{"module":"module1","test":"bdd"},{"module":"module2","test":"unit"}]}'
+    def output_json(self, final_output, output_var="PYTHON_OUTPUT", github_type="GITHUB_OUTPUT"):
+        """
+        Detects whether we are running in a Github Actions environment or not. If yes then it sets the relevant github variable. If not then it outputs the values - useful if calling this code as a python module.
+        Note, setting GITHUB_OUTPUT or GITHUB_ENV will not reflect the value in the currently running step but will be available in all subsequent jobs/steps as required
+        """
+        if github_type in os.environ:
+            # Write to GITHUB_OUTPUT/GITHUB_ENV as a variable named from the output_var variable value passed into this function
+            with open(os.environ[github_type], "a") as fh:
+                # example: matrix strategy config output: 'PYTHON_OUTPUT={"include":[{"module":"module1","test":"unit"},{"module":"module1","test":"bdd"},{"module":"module2","test":"unit"}]}'
                 # note, if output_var is not supplied then the the default GITHUB_OUTPUT variable will be named PYTHON_OUTPUT
                 #       if using multiple python scripts then this variable needs to change otherwise running this again will overwrite the GITHUB_OUTPUT variable!
                 print(f"{output_var}={str(json.dumps(final_output))}", file=fh)
@@ -182,5 +188,5 @@ if __name__ == "__main__":
     app.build_modules_config(files_string, output_var)
     
     # Build the tests include matrix config
-    matrix_strategy_json = app.build_tests_include_matrix_config()
+    matrix_strategy_json = app.build_tests_matrix_config()
     print(matrix_strategy_json)

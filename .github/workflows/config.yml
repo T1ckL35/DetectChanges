@@ -13,6 +13,9 @@ on:
         - warning
         - debug
 
+env:
+  MODULES_CONFIG: ""    # Updated by the python script to contain a json list of modules and any other relevant data (versions, tests etc..)
+
 jobs:
 
   build_configuration:
@@ -26,7 +29,7 @@ jobs:
     #  matrix: ${{ steps.run_script.outputs.MODULES_MATRIX }}    # Will be used in another job to run module tests with
     outputs:
         all_changed_files: ${{ steps.build_changed_files.outputs.changed_files }}                 # diff of all current files that have changed. ALso used to build a configuration on if a module has tests to run
-        modules_configuration: ${{ steps.build_tests_matrix_includes.outputs.MODULES_CONFIG }}    # configuration of module information for any that have had file changes made. Consists of the module name and a list of tests, if present. Future additions will be to detect the current module version and predict the next version to use if all tests pass
+        # modules_configuration: ${{ steps.build_tests_matrix_includes.outputs.MODULES_CONFIG }}    # configuration of module information for any that have had file changes made. Consists of the module name and a list of tests, if present. Future additions will be to detect the current module version and predict the next version to use if all tests pass
         tests_matrix: ${{ steps.build_tests_matrix_includes.outputs.TESTS_MATRIX_OUTPUT }}        # matrix of tests to run against changed modules
     #env:
     #  NBS_MODULE_MATRIX_NAME: "MODULES_MATRIX"                # Defines the variable name in GITHUB_OUTPUT that the python modules script outputs the data to
@@ -81,16 +84,15 @@ jobs:
           app.output_logging()
           
           # Build the modules config
-          # TODO1: test passing in a prepopulated one as an example
-          # TODO2: test
+          # Automatically pushes the configuration to env.MODULES_CONFIG so it can be used in other jobs/steps
           app.build_modules_config("${{ steps.build_changed_files.outputs.changed_files }}", "MODULES_CONFIG")
           
-          # Build the tests include matrix config
-          app.build_tests_include_matrix_config()
+          # Build the tests include matrix config. Automatically pushes the result to GITHUB_OUTPUT
+          app.build_tests_matrix_config()
       - id: debug_show_modules_config
         name: Check the modules config output is correct
         run: |
-          echo "${{ steps.build_tests_matrix_includes.outputs.MODULES_CONFIG }}"    # TODO: Push this one to an Environment variable so it can be used and updated as needed
+          echo "${{ env.MODULES_CONFIG }}" # check it has been set in the previous step (can't check in the same step as it won't show the update there)
           echo "${{ steps.build_tests_matrix_includes.outputs.TESTS_MATRIX_OUTPUT }}"
           
 
@@ -113,3 +115,5 @@ jobs:
           fetch-depth: 0
       - run: |
           echo "For Module: ${{matrix.module}} Running Test: ${{matrix.test}}"  
+      - run: |
+          echo "Debug test to check that the modules_config env var has been set and is available: ${{ env.MODULES_CONFIG }}""
