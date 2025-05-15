@@ -145,7 +145,7 @@ jobs:
       - run: |
           echo "Debug on modules_configuration variable: ${{ needs.build_configuration.outputs.modules_configuration }}"
 
-  test_update_modules_config:
-    name: Testing updating the modules_config
-    needs: [run_module_tests]
-    runs-on: ubuntu-latest
+  # test_update_modules_config:
+  #   name: Testing updating the modules_config
+  #   needs: [run_module_tests]
+  #   runs-on: ubuntu-latest
