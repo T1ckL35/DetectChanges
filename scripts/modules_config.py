@@ -132,7 +132,7 @@ class ModulesConfig:
         if strategy_config:
             wrapped_matrix_strategy = self.wrap_matrix_strategy_type("include", strategy_config)
             # Push the output to the default GITHUB_OUTPUT variable.
-            return self.output_json(wrapped_matrix_strategy, "TESTS_MATRIX_OUTPUT")
+            return self.output_json(wrapped_matrix_strategy, "TESTS_MATRIX_OUTPUT", "GITHUB_ENV")
             # The subsequent tests matrix job needs to detect if this variable has been set in GITHUB_OUTPUT.
 
     def generate_matrix_strategy_config(self, item, list, param1="module", param2="test"):
@@ -156,14 +156,14 @@ class ModulesConfig:
             name: matrix_strategy_config
         }
     
-    def output_json(self, final_output, output_var="PYTHON_OUTPUT"):
+    def output_json(self, final_output, output_var="PYTHON_OUTPUT", github_type="GITHUB_OUTPUT"):
         """
         Detects whether we are running in a Github Actions environment or not. If yes then it sets the relevant github variable. If not then it outputs the values - useful if calling this code as a python module.
         Note, setting GITHUB_OUTPUT will not reflect the value in the currently running step but will be available in all subsequent jobs/steps as required
         """
-        if "GITHUB_OUTPUT" in os.environ:
+        if github_type in os.environ:
             # Write to GITHUB_OUTPUT as a variable named from the output_var variable value passed into this function
-            with open(os.environ["GITHUB_OUTPUT"], "a") as fh:
+            with open(os.getenv[github_type], "a") as fh:
                 # example: matrix strategy config output: 'PYTHON_OUTPUT={"include":[{"module":"module1","test":"unit"},{"module":"module1","test":"bdd"},{"module":"module2","test":"unit"}]}'
                 # note, if output_var is not supplied then the the default GITHUB_OUTPUT variable will be named PYTHON_OUTPUT
                 #       if using multiple python scripts then this variable needs to change otherwise running this again will overwrite the GITHUB_OUTPUT variable!

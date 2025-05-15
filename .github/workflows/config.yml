@@ -101,6 +101,7 @@ jobs:
           import os
           env_file = os.getenv('GITHUB_ENV')
           with open(env_file, "a") as myfile:
+              # Note, if adding multiple variables with separate commands then add \n to the end of each line (apart from the last)
               myfile.write("myvar2=UPDATED_BY_PYTHON")
       - name: DEBUG - Show the environment variables
         run: |
