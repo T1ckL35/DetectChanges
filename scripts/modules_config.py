@@ -174,6 +174,9 @@ class ModulesConfig:
             return json.dumps(final_output)
     
 if __name__ == "__main__":
+    """
+    Only runs the code below if the script is called directly. Usually it is called from a Github Actions workflow with inline python code.
+    """
     # Create an instance of the ModulesConfig class
     app = ModulesConfig()
     

@@ -72,7 +72,8 @@ jobs:
           from scripts import modules_config
 
           # Create an instance of the ModulesConfig class
-          app = modules_config.ModulesConfig()
+          TestJsonModulesConfigOverride = '[{"module": "module3", "tests": ["bdd"]}]''
+          app = modules_config.ModulesConfig(TestJsonModulesConfigOverride)
 
           # Configure logging to output to both file and console
           app.output_logging()
@@ -97,12 +98,17 @@ jobs:
     strategy:
       matrix: ${{ fromJSON(needs.build_configuration.outputs.tests_matrix) }}
         # tests_matrix is a prebuilt json structure that maps to something similar as below in yaml
-        # This then makes this job run multiple times for each item and passes in the matrix values for each
+        # An example json structure is: {"include":[{"module":"module1","test":"unit"},{"module":"module1","test":"bdd"},{"module":"module2","test":"unit"}]}
+        # And the corresponding conversion to yaml with the fromJSON github function is below:
+        # The include configuration makes this job run multiple times for each item and passes in the matrix values for each.
+        # So in this case 3 jobs are run: [module1, unit], [module, 1 bdd] and [module2, unit]
         # include:
         #   - module: "module1"
         #     test: "unit"
         #   - module: "module1"
         #     test: "bdd"
+        #   - module: "module2"
+        #     test: "unit"
     steps:
       - id: run_test
         name: Run the specified test
