@@ -1,8 +1,9 @@
-import argparse
+
 import logging
 import os
 import sys
 import json
+# Make sure requirements.txt has entries for the PyGitHub and semver modules
 from github import Github, GithubException, Auth
 import semver
 
@@ -25,15 +26,18 @@ class ModulesConfig:
         logging.basicConfig(filename=self.logfile_name,level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s: %(message)s')
         logging.info('ModulesConfig initialising...')
 
+        # If we have passed in a modules_config then use that. Mainly intended for overriding the default/calculated modules_config for testing purposes.
         if modules_config:
             logging.debug("ModulesConfig - modules_config supplied")
             self.modules_config = json.loads(modules_config)
         else:
-            # First read the environment to see if we already have a modules_config set
+            # Check to see if we have a modules_config already set in the environment. If so use that, otherwise build a new one
             if self.modules_config_env_var in os.environ and os.environ[self.modules_config_env_var] != "":
+                # First read the environment to see if we already have a modules_config set
                 logging.debug("ModulesConfig - populated modules_config found in environment")
                 self.modules_config = json.loads(os.environ[self.modules_config_env_var])
             else:
+                # Nothing found so genreate a new modules_config by parsing the changed files
                 logging.debug("ModulesConfig - no populated modules_config found in environment. A new configuration will be built")
 
 
@@ -49,6 +53,7 @@ class ModulesConfig:
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         output_logger.setFormatter(formatter)
         root_logger.addHandler(output_logger)
+
 
     def build_modules_config(self, files_string, output_var):
         """
@@ -93,7 +98,7 @@ class ModulesConfig:
                     next_versions = self.get_modules_tag(path_parts[1])
                     logging.debug(f"ModulesConfig - next versions: {next_versions}")
                     # TODO: Need to parse the PR message to determine which next version to use (major, minor or patch)
-                    module_info['next_versions'] = next_versions
+                    module_info['versions'] = next_versions
 
                     # check for tests folders. If present add a 'tests' key to the dictionary with a list of tests to run
                     tests_path = os.path.join(os.getcwd(), path_parts[0], path_parts[1], "tests")
@@ -109,6 +114,7 @@ class ModulesConfig:
             # If not then just return the json data
             return self.output_json(self.modules_config, self.modules_config_env_var)
 
+
     def get_tests_list(self, module_tests_path):
         """
         Get the list of tests present in the specified module directory
@@ -123,11 +129,12 @@ class ModulesConfig:
                 detected_tests.append(test_name)
         return detected_tests
     
+
     def get_modules_tag(self, reference):
         """
         Get the latest module tag
-        :param module_name:
-        :return:
+        :param reference: The module name to check for tags
+        :return: A dictionary object either empty or with the current version and the next major, minor and patch versions
         """
         # Public Web Github
         #g = Github(auth=auth)
@@ -144,17 +151,19 @@ class ModulesConfig:
         version_object = {}
 
         try:
-            print(f"Checking GitHub Tag with reference tags/{reference}....")
-            logging.debug(f"Checking GitHub Tag with reference tags/{reference}....")
+            logging.debug(f"Checking GitHub Tag with reference tags/{reference}*...")
             tag = repo.get_git_ref(f"tags/{reference}")
             if tag._rawData:
-                print(f"GitHub Tag with reference tags/{reference} exists....")
-                logging.debug(f"GitHub Tag with reference tags/{reference} exists....")
+                logging.debug(f"GitHub Tag with reference tags/{reference}* exists...")
 
                 # grabs all found prefix named tags, gets the semver tag from the ref name and sorts them
                 current_semver_tag = sorted(list((object['ref'].removeprefix(f"refs/tags/{reference}-") for object in tag._rawData)))[-1]
                 print(f"Current semver tag is: {current_semver_tag}")
                 logging.debug(f"Current semver tag is: {current_semver_tag}")
+
+                # If this module has not yet been tagged then set the current version to 0.0.1
+                if current_semver_tag == "":
+                    current_version_tag = "0.0.1"
 
                 version_object = {
                     "current": current_semver_tag,
@@ -215,6 +224,7 @@ class ModulesConfig:
             return self.output_json(wrapped_matrix_strategy, "TESTS_MATRIX_OUTPUT")
             # The subsequent tests matrix job needs to detect if this variable has been set in GITHUB_OUTPUT.
 
+
     def generate_matrix_strategy_config(self, item, list, param1="module", param2="test"):
         """
         Generates a list of options based on the provided item and list.
@@ -228,6 +238,7 @@ class ModulesConfig:
             options_list.append(options)
         return options_list
     
+
     def wrap_matrix_strategy_type(self, name, matrix_strategy_config):
         """
         Wraps the matrix configuration in a dictionary with a key. Could be "include" or "exclude" as required
@@ -236,6 +247,7 @@ class ModulesConfig:
             name: matrix_strategy_config
         }
     
+
     def output_json(self, final_output, output_var="PYTHON_OUTPUT"):
         """
         Detects whether we are running in a Github Actions environment or not. If yes then it sets the relevant github variable. If not then it outputs the values - useful if calling this code as a python module.
@@ -253,6 +265,7 @@ class ModulesConfig:
             logging.info(json.dumps(final_output, indent=2))
             return json.dumps(final_output)
     
+
 if __name__ == "__main__":
     """
     Only runs the code below if the script is called directly. Usually it is called from a Github Actions workflow with inline python code.
