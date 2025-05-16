@@ -94,6 +94,8 @@ jobs:
           
           # Build the tests include matrix config. Automatically pushes the result to GITHUB_OUTPUT
           app.build_tests_matrix_config()
+          app.get_modules_tag("module1")
+          
       - id: debug_show_modules_config
         name: Check the modules config output is correct
         run: |

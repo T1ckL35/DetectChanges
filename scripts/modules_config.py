@@ -3,6 +3,7 @@ import logging
 import os
 import sys
 import json
+from github import Github, GithubException, Auth
 
 class ModulesConfig:
 
@@ -114,6 +115,48 @@ class ModulesConfig:
             if os.path.isdir(test_path):
                 detected_tests.append(test_name)
         return detected_tests
+    
+    def get_modules_tag(self, reference):
+        """
+        Get the latest module tag
+        :param module_name:
+        :return:
+        """
+        # Public Web Github
+        #g = Github(auth=auth)
+        # Set in the GHA Workflow
+        auth = Auth.Token(os.environ['GH_TOKEN'])
+        g = Github(auth=auth)
+        # g = Github(os.environ['GH_TOKEN'])
+        repo = g.get_repo("T1ckL35/DetectChanges")
+
+        # Github Enterprise with custom hostname
+        # g = Github(base_url="https://{hostname}/api/v3", auth=auth)
+        try:
+            print(f"Checking GitHub Tag with reference tags/v{reference}....")
+            logging.debug(f"Checking GitHub Tag with reference tags/v{reference}....")
+            tag = repo.get_git_ref(f"tags/{reference}")
+            # PyGitHub returns GitRef(ref=None) if for example searching for tag v13 and v13 does not exist, but v13.0.0 exists
+            # It returns a 404 if for example searching for tag v13.0.0 and v13.0.0 does not exist
+            if tag.ref == None:
+                print(f"Unable to find GitHub Tag with reference tags/{reference}.")
+                logging.debug(f"Unable to find GitHub Tag with reference tags/{reference}.")
+                return False
+            else:
+                print(f"Successfully found GitHub Tag with reference tags/{reference}.")
+                logging.debug(f"Successfully found GitHub Tag with reference tags/{reference}.")
+                return True
+        except GithubException as e:
+            if e.status == 404:
+                print(f"Unable to find GitHub Tag with reference tags/{reference}.")
+                logging.debug(f"Unable to find GitHub Tag with reference tags/{reference}.")
+                return False
+            else:
+                logging.debug(f"Retrieving GitHub Tag has failed with the following status code: {e.status}")
+                raise Exception(
+                    f"Retrieving GitHub Tag has failed with the following status code: {e.status}"
+                )
+
     
     def build_tests_matrix_config(self):
         """
