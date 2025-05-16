@@ -153,52 +153,41 @@ class ModulesConfig:
         try:
             logging.debug(f"Checking GitHub Tag with reference tags/{reference}*...")
             tag = repo.get_git_ref(f"tags/{reference}")
-            if not tag._rawData:
-                logging.debug(f"No GitHub tag for for current module tags/{reference}* so creating one as 0.0.1")
-                current_version_tag = "0.0.1"
-            else:
+            if tag._rawData:
                 logging.debug(f"GitHub Tag with reference tags/{reference}* exists...")
 
                 # grabs all found prefix named tags, gets the semver tag from the ref name and sorts them
                 current_semver_tag = sorted(list((object['ref'].removeprefix(f"refs/tags/{reference}-") for object in tag._rawData)))[-1]
-                print(f"Current semver tag is: {current_semver_tag}")
-                logging.debug(f"Current semver tag is: {current_semver_tag}")
-
-                version_object = {
-                    "current": current_semver_tag,
-                    "major": semver.bump_major(current_semver_tag),
-                    "minor": semver.bump_minor(current_semver_tag),
-                    "patch": semver.bump_patch(current_semver_tag)
-                }
-
-                major = semver.bump_major(current_semver_tag)
-                logging.debug(f"Next major semver tag is: {major}")
-                minor = semver.bump_minor(current_semver_tag)
-                logging.debug(f"Next minor semver tag is: {minor}")
-                patch = semver.bump_patch(current_semver_tag)
-                logging.debug(f"Next path semver tag is: {patch}")
+                logging.debug(f"Current found semver tag is: {current_semver_tag}")
 
             # PyGitHub returns GitRef(ref=None) if for example searching for tag v13 and v13 does not exist, but v13.0.0 exists
             # It returns a 404 if for example searching for tag v13.0.0 and v13.0.0 does not exist
-            if tag._rawData == None:
-                print(f"Unable to find GitHub Tag with reference tags/{reference}.")
-                logging.debug(f"Unable to find GitHub Tag with reference tags/{reference}.")
-                #return False
-            else:
-                print(f"Successfully found GitHub Tag with reference tags/{reference}.")
-                logging.debug(f"Successfully found GitHub Tag with reference tags/{reference}.")
-                #return True
+
         except GithubException as e:
             if e.status == 404:
-                print(f"Unable to find GitHub Tag with reference tags/{reference}.")
-                logging.debug(f"Unable to find GitHub Tag with reference tags/{reference}.")
-                #return False
+                # PyGitHub returns a 404 if for example searching for tag v13.0.0 and v13.0.0 does not exist
+                # If the tag does not exist then set the current version to 0.0.1
+                logging.debug(f"Unable to find GitHub Tag with reference tags/{reference}* - 404 error. Creating a first tag...")
+                current_version_tag = "0.0.1"
             else:
                 logging.debug(f"Retrieving GitHub Tag has failed with the following status code: {e.status}")
                 raise Exception(
                     f"Retrieving GitHub Tag has failed with the following status code: {e.status}"
                 )
-        return version_object
+        return self.build_versions(version_object)
+    
+    def build_versions(self, current_version="0.0.1"):
+        """
+        Build the versions object based on the current version supplied
+        :param current_version: The current version to use as a base. Defaults to 0.0.1 if no tag has been supplied.
+        :return: A dictionary object with the current, major, minor and patch versions
+        """
+        return {
+            "current": current_version,
+            "major": semver.bump_major(current_version),
+            "minor": semver.bump_minor(current_version),
+            "patch": semver.bump_patch(current_version)
+        }
 
     
     def build_tests_matrix_config(self):
