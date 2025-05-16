@@ -4,6 +4,7 @@ import os
 import sys
 import json
 from github import Github, GithubException, Auth
+import semver
 
 class ModulesConfig:
 
@@ -136,10 +137,27 @@ class ModulesConfig:
             print(f"Checking GitHub Tag with reference tags/{reference}....")
             logging.debug(f"Checking GitHub Tag with reference tags/{reference}....")
             tag = repo.get_git_ref(f"tags/{reference}")
-            logging.debug(tag._rawData)
+            if tag._rawData:
+                print(f"GitHub Tag with reference tags/{reference} exists....")
+                logging.debug(f"GitHub Tag with reference tags/{reference} exists....")
+
+                # grabs all found prefix named tags, gets the semver tag from the ref name and sorts them
+                current_semver_tag = sorted(list((object['ref'].removeprefix(f"refs/tags/{reference}-") for object in tag._rawData)))[-1]
+                print(f"Current semver tag is: {current_semver_tag}")
+                logging.debug(f"Current semver tag is: {current_semver_tag}")
+
+                major = semver.bump_major(current_semver_tag)
+                logging.debug(f"Next major semver tag is: {major}")
+                minor = semver.bump_minor(current_semver_tag)
+                logging.debug(f"Next minor semver tag is: {minor}")
+                patch = semver.bump_patch(current_semver_tag)
+                logging.debug(f"Next path semver tag is: {patch}")
+
+            # logging.debug(tag._rawData)
+
             # PyGitHub returns GitRef(ref=None) if for example searching for tag v13 and v13 does not exist, but v13.0.0 exists
             # It returns a 404 if for example searching for tag v13.0.0 and v13.0.0 does not exist
-            if tag.ref == None:
+            if tag._rawData == None:
                 print(f"Unable to find GitHub Tag with reference tags/{reference}.")
                 logging.debug(f"Unable to find GitHub Tag with reference tags/{reference}.")
                 return False

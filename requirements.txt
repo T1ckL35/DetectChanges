@@ -1,1 +1,2 @@
-PyGitHub>=2.5.0
+PyGitHub
+semver
