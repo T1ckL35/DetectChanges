@@ -153,17 +153,16 @@ class ModulesConfig:
         try:
             logging.debug(f"Checking GitHub Tag with reference tags/{reference}*...")
             tag = repo.get_git_ref(f"tags/{reference}")
-            if tag._rawData:
+            if not tag._rawData:
+                logging.debug(f"No GitHub tag for for current module tags/{reference}* so creating one as 0.0.1")
+                current_version_tag = "0.0.1"
+            else:
                 logging.debug(f"GitHub Tag with reference tags/{reference}* exists...")
 
                 # grabs all found prefix named tags, gets the semver tag from the ref name and sorts them
                 current_semver_tag = sorted(list((object['ref'].removeprefix(f"refs/tags/{reference}-") for object in tag._rawData)))[-1]
                 print(f"Current semver tag is: {current_semver_tag}")
                 logging.debug(f"Current semver tag is: {current_semver_tag}")
-
-                # If this module has not yet been tagged then set the current version to 0.0.1
-                if current_semver_tag == "":
-                    current_version_tag = "0.0.1"
 
                 version_object = {
                     "current": current_semver_tag,
@@ -178,8 +177,6 @@ class ModulesConfig:
                 logging.debug(f"Next minor semver tag is: {minor}")
                 patch = semver.bump_patch(current_semver_tag)
                 logging.debug(f"Next path semver tag is: {patch}")
-
-            # logging.debug(tag._rawData)
 
             # PyGitHub returns GitRef(ref=None) if for example searching for tag v13 and v13 does not exist, but v13.0.0 exists
             # It returns a 404 if for example searching for tag v13.0.0 and v13.0.0 does not exist
