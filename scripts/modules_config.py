@@ -147,8 +147,8 @@ class ModulesConfig:
         # Github Enterprise with custom hostname
         # g = Github(base_url="https://{hostname}/api/v3", auth=auth)
 
-        # Object to store current and future versions in
-        version_object = {}
+        # Default is to define a new 0.0.0 tag if no module tags are detected. When calculated the next patch tag will be 0.0.1
+        current_semver_tag = "0.0.0"
 
         try:
             logging.debug(f"Checking GitHub Tag with reference tags/{reference}*...")
@@ -166,15 +166,15 @@ class ModulesConfig:
         except GithubException as e:
             if e.status == 404:
                 # PyGitHub returns a 404 if for example searching for tag v13.0.0 and v13.0.0 does not exist
-                # If the tag does not exist then set the current version to 0.0.1
+                # Drops through and defines a new 0.0.1 tag if no tags are found
                 logging.debug(f"Unable to find GitHub Tag with reference tags/{reference}* - 404 error. Creating a first tag...")
-                current_version_tag = "0.0.1"
             else:
                 logging.debug(f"Retrieving GitHub Tag has failed with the following status code: {e.status}")
                 raise Exception(
                     f"Retrieving GitHub Tag has failed with the following status code: {e.status}"
                 )
-        return self.build_versions(version_object)
+        return self.build_versions(current_semver_tag)
+    
     
     def build_versions(self, current_version="0.0.1"):
         """
