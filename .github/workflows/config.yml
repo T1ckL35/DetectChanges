@@ -96,7 +96,9 @@ jobs:
           
           # Build the tests include matrix config. Automatically pushes the result to GITHUB_OUTPUT
           app.build_tests_matrix_config()
-          app.get_modules_tag("module1")
+          
+          # test
+          #app.get_modules_tag("module1")
 
       - id: debug_show_modules_config
         name: Check the modules config output is correct
@@ -148,3 +150,60 @@ jobs:
   #   name: Testing updating the modules_config
   #   needs: [run_module_tests]
   #   runs-on: ubuntu-latest
+
+
+  # get_module_versioning:
+  #   name: "Get Module Versioning"
+  #   needs: [build_configuration]
+  #   if: ${{ success() && needs.build_configuration.outputs.tests_matrix }}
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix: ${{ fromJSON(needs.build_configuration.outputs.tests_matrix) }}
+  #   steps:
+  #     - id: setup_python
+  #       name: Set up Python to use
+  #       uses: actions/setup-python@v5
+  #       with:
+  #         python-version: 3.12
+  #         # cache: 'pip' # caching pip dependencies
+  #     - id: install_dependencies
+  #       name: Install dependencies
+  #       run: |
+  #         # Install the dependencies
+  #         python -m pip install --upgrade pip
+  #         pip install -r requirements.txt
+  #     - id: configure_pythonpath
+  #       name: Sorts the PYTHONPATH so we can import custom python modules from the codebase
+  #       run: |
+  #         echo "PYTHONPATH=$PYTHONPATH:${{ github.workspace }}" >> $GITHUB_ENV
+  #     - id: show_pythonPath
+  #       name: show python path
+  #       run: |
+  #         python -c "import sys; import os; print('\n'.join(sys.path)); print(os.getcwd())"
+  #     - id: build_tests_matrix_includes
+  #       name: Run a python script inline to convert a bash space deparated string into a json list
+  #       env:
+  #         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       shell: python
+  #       run: |
+  #         # codepath isn't in PYTHONPATH
+  #         # ${{ github.workspace }} # e.g, /home/runner/work/my-repo-name/my-repo-name
+  #         from scripts import modules_config
+
+  #         # Create an instance of the ModulesConfig class
+  #         app = modules_config.ModulesConfig()
+
+  #         ## Example of how to prepopulate modules_config for if it has already been set or needs to be overridden
+  #         ## test_modules_config_override = '[{"module": "module3", "tests": ["bdd"]}]'
+  #         ## app = modules_config.ModulesConfig(test_modules_config_override)
+
+  #         # Configure logging to output to both file and console. TODO: only do this if running the workflow in debug mode
+  #         app.output_logging()
+          
+  #         # Build the modules config
+  #         # Automatically pushes the modules configuration to GITHUB_OUTPUT so it can be used in other jobs/steps
+  #         app.build_modules_config("${{ steps.build_changed_files.outputs.changed_files }}", "MODULES_CONFIG")
+          
+  #         # Build the tests include matrix config. Automatically pushes the result to GITHUB_OUTPUT
+  #         app.build_tests_matrix_config()
+  #         app.get_modules_tag("module1")

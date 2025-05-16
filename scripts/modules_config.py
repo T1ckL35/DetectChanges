@@ -89,6 +89,12 @@ class ModulesConfig:
                     }
                     logging.debug(f"ModulesConfig - module_info: {module_info}")
 
+                    # check for tags and work out the next version number
+                    next_versions = self.get_modules_tag(path_parts[1])
+                    logging.debug(f"ModulesConfig - next versions: {next_versions}")
+                    # TODO: Need to parse the PR message to determine which next version to use (major, minor or patch)
+                    module_info['next_versions'] = next_versions
+
                     # check for tests folders. If present add a 'tests' key to the dictionary with a list of tests to run
                     tests_path = os.path.join(os.getcwd(), path_parts[0], path_parts[1], "tests")
                     logging.debug(f"ModulesConfig - tests_path: {tests_path}")
@@ -133,6 +139,10 @@ class ModulesConfig:
 
         # Github Enterprise with custom hostname
         # g = Github(base_url="https://{hostname}/api/v3", auth=auth)
+
+        # Object to store current and future versions in
+        version_object = {}
+
         try:
             print(f"Checking GitHub Tag with reference tags/{reference}....")
             logging.debug(f"Checking GitHub Tag with reference tags/{reference}....")
@@ -145,6 +155,13 @@ class ModulesConfig:
                 current_semver_tag = sorted(list((object['ref'].removeprefix(f"refs/tags/{reference}-") for object in tag._rawData)))[-1]
                 print(f"Current semver tag is: {current_semver_tag}")
                 logging.debug(f"Current semver tag is: {current_semver_tag}")
+
+                version_object = {
+                    "current": current_semver_tag,
+                    "major": semver.bump_major(current_semver_tag),
+                    "minor": semver.bump_minor(current_semver_tag),
+                    "patch": semver.bump_patch(current_semver_tag)
+                }
 
                 major = semver.bump_major(current_semver_tag)
                 logging.debug(f"Next major semver tag is: {major}")
@@ -160,21 +177,22 @@ class ModulesConfig:
             if tag._rawData == None:
                 print(f"Unable to find GitHub Tag with reference tags/{reference}.")
                 logging.debug(f"Unable to find GitHub Tag with reference tags/{reference}.")
-                return False
+                #return False
             else:
                 print(f"Successfully found GitHub Tag with reference tags/{reference}.")
                 logging.debug(f"Successfully found GitHub Tag with reference tags/{reference}.")
-                return True
+                #return True
         except GithubException as e:
             if e.status == 404:
                 print(f"Unable to find GitHub Tag with reference tags/{reference}.")
                 logging.debug(f"Unable to find GitHub Tag with reference tags/{reference}.")
-                return False
+                #return False
             else:
                 logging.debug(f"Retrieving GitHub Tag has failed with the following status code: {e.status}")
                 raise Exception(
                     f"Retrieving GitHub Tag has failed with the following status code: {e.status}"
                 )
+        return version_object
 
     
     def build_tests_matrix_config(self):
