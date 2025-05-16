@@ -133,9 +133,10 @@ class ModulesConfig:
         # Github Enterprise with custom hostname
         # g = Github(base_url="https://{hostname}/api/v3", auth=auth)
         try:
-            print(f"Checking GitHub Tag with reference tags/v{reference}....")
-            logging.debug(f"Checking GitHub Tag with reference tags/v{reference}....")
+            print(f"Checking GitHub Tag with reference tags/{reference}....")
+            logging.debug(f"Checking GitHub Tag with reference tags/{reference}....")
             tag = repo.get_git_ref(f"tags/{reference}")
+            logging.debug(tag._rawData)
             # PyGitHub returns GitRef(ref=None) if for example searching for tag v13 and v13 does not exist, but v13.0.0 exists
             # It returns a 404 if for example searching for tag v13.0.0 and v13.0.0 does not exist
             if tag.ref == None:
