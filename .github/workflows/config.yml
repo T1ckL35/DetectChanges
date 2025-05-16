@@ -101,8 +101,10 @@ jobs:
           echo "${{ steps.build_tests_matrix_includes.outputs.TESTS_MATRIX_OUTPUT }}"
       - id: testing_pygithub
         name: Testing PyGithub
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python -c "import os; from github import Github; g = Github(os.environ['GITHUB_TOKEN']); print(g.get_user())"
+          python -c "import os; from github import Github; g = Github(os.environ['GH_TOKEN']); print(g.get_user())"
 
 
   run_module_tests:
