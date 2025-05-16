@@ -55,6 +55,13 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: 3.12
+          # cache: 'pip' # caching pip dependencies
+      - id: install_dependencies
+        name: Install dependencies
+        run: |
+          # Install the dependencies
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
       - id: configure_pythonpath
         name: Sorts the PYTHONPATH so we can import custom python modules from the codebase
         run: |
